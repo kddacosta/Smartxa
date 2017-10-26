@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_sample/build/intermediates/res/merged/debug/drawable-xhdpi-v4/scrubber_control_normal_holo.png",
+        "source": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/bundles/default/res/drawable-xhdpi-v4/scrubber_control_normal_holo.png"
+    },
+    {
+        "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_sample/build/intermediates/res/merged/debug/drawable-xhdpi-v4/scrubber_control_pressed_holo.png",
+        "source": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/bundles/default/res/drawable-xhdpi-v4/scrubber_control_pressed_holo.png"
+    },
+    {
+        "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_sample/build/intermediates/res/merged/debug/drawable-xhdpi-v4/scrubber_control_focused_holo.png",
+        "source": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/bundles/default/res/drawable-xhdpi-v4/scrubber_control_focused_holo.png"
+    },
+    {
+        "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_sample/build/intermediates/res/merged/debug/drawable-xhdpi-v4/scrubber_control_disabled_holo.png",
+        "source": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/bundles/default/res/drawable-xhdpi-v4/scrubber_control_disabled_holo.png"
+    }
+]
