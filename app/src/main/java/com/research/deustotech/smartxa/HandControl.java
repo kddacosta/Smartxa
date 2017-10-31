@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.*;
 
 import com.seekcircle.SeekCircle;
 
@@ -31,7 +32,9 @@ public class HandControl extends AppCompatActivity {
     BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter(); //null;
     private String address = MainActivity.smartxaAddress;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    List motorsList = null;
+    //List<Integer> motorsList = null;
+
+    JSONObject jsonMotors = new JSONObject();
 
     ImageButton f1, f2, f3, f4, f5;
     TextView a, b, c, d, e, Seekbar_Text;
@@ -42,6 +45,22 @@ public class HandControl extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hand_control);
+
+        try
+        {
+            jsonMotors.put("motor1", 0);
+            jsonMotors.put("motor2", 0);
+            jsonMotors.put("motor3", 0);
+            jsonMotors.put("motor4", 0);
+            jsonMotors.put("motor5", 0);
+            //jsonMotors.put("motor6", 0);
+            jsonMotors.put("angle", 0);
+
+        }
+        catch (Exception e)
+        {
+
+        }
 
         new ConnectBTFinger().execute();
 
@@ -64,11 +83,11 @@ public class HandControl extends AppCompatActivity {
         d = (TextView) findViewById(R.id.f4Text);
         e = (TextView) findViewById(R.id.f5Text); */
 
-        seebbarr(a);
+        seekbar();
     }
 
 
-    public void seebbarr(final TextView visibility){
+    public void seekbar(/*final TextView visibility*/){
         seek_bar = (SeekBar)findViewById(R.id.seekBar);
         Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
         Seekbar_Text.setText(seek_bar.getProgress() + "/" + seek_bar.getMax());
@@ -83,7 +102,9 @@ public class HandControl extends AppCompatActivity {
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         progress_value = progress;
                         Seekbar_Text.setText(progress + "/" + seek_bar.getMax());
-                        visibility.setAlpha(200 - 2*progress_value);
+                        //visibility.setAlpha(200 - 2*progress_value);
+
+                        updateAngle();
                     }
 
                     @Override
@@ -104,10 +125,22 @@ public class HandControl extends AppCompatActivity {
     {
         if(f1.getImageAlpha() == 0){
             f1.setImageAlpha(255);
-            motorsList.add(1);
+            //motorsList.add(1);
+            try {
+                jsonMotors.remove("motor1");
+                jsonMotors.put("motor1", 1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else {
             f1.setImageAlpha(0);
-            motorsList.remove(1);
+            //motorsList.remove(1);
+            try {
+                jsonMotors.remove("motor1");
+                jsonMotors.put("motor1", 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -115,10 +148,22 @@ public class HandControl extends AppCompatActivity {
     {
         if(f2.getImageAlpha() == 0){
             f2.setImageAlpha(255);
-            motorsList.add(2);
+            //motorsList.add(2);
+            try {
+                jsonMotors.remove("motor2");
+                jsonMotors.put("motor2", 1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else {
             f2.setImageAlpha(0);
-            motorsList.remove(2);
+            //motorsList.remove(2);
+            try {
+                jsonMotors.remove("motor2");
+                jsonMotors.put("motor2", 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -126,10 +171,22 @@ public class HandControl extends AppCompatActivity {
     {
         if(f3.getImageAlpha() == 0){
             f3.setImageAlpha(255);
-            motorsList.add(3);
+            //motorsList.add(3);
+            try {
+                jsonMotors.remove("motor3");
+                jsonMotors.put("motor3", 1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else {
             f3.setImageAlpha(0);
-            motorsList.remove(3);
+            //motorsList.remove(3);
+            try {
+                jsonMotors.remove("motor3");
+                jsonMotors.put("motor3", 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -137,10 +194,22 @@ public class HandControl extends AppCompatActivity {
     {
         if(f4.getImageAlpha() == 0){
             f4.setImageAlpha(255);
-            motorsList.add(4);
+            //motorsList.add(4);
+            try {
+                jsonMotors.remove("motor4");
+                jsonMotors.put("motor4", 1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else {
             f4.setImageAlpha(0);
-            motorsList.remove(4);
+            //motorsList.remove(4);
+            try {
+                jsonMotors.remove("motor4");
+                jsonMotors.put("motor4", 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -148,10 +217,22 @@ public class HandControl extends AppCompatActivity {
     {
         if(f5.getImageAlpha() == 0){
             f5.setImageAlpha(255);
-            motorsList.add(5);
+            //motorsList.add(5);
+            try {
+                jsonMotors.remove("motor5");
+                jsonMotors.put("motor5", 1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else {
             f5.setImageAlpha(0);
-            motorsList.remove(5);
+            //motorsList.remove(5);
+            try {
+                jsonMotors.remove("motor5");
+                jsonMotors.put("motor5", 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -177,11 +258,13 @@ public class HandControl extends AppCompatActivity {
 
     private void updateAngle() {
 
+        /*
         String motors = "";
         for ( Object m : motorsList)
         {
              motors = motors.concat(m + ",");
         }
+        */
         SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         //TextView textProgress = (TextView) findViewById(R.id.textView4);
 
@@ -190,7 +273,13 @@ public class HandControl extends AppCompatActivity {
             {
             int progress = seekBar.getProgress();
             //textProgress.setText(Integer.toString(progress) + "\u00b0");
-            btSocket.getOutputStream().write(String.valueOf(motors + progress).getBytes());
+                try {
+                    jsonMotors.remove("angle");
+                    jsonMotors.put("angle", progress);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
             }
            catch (java.io.IOException e)
             {

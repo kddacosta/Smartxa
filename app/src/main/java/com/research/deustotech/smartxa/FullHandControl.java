@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.UUID;
+import org.json.*;
 
 //import static android.provider.Settings.Secure.ANDROID_ID;
 
@@ -25,7 +26,10 @@ public class FullHandControl extends AppCompatActivity {
 
     BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter(); //null;
     private String address = MainActivity.smartxaAddress;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //"00001101-0000-1000-8000-00805F9B34FB"
+
+    JSONObject jsonMotors = new JSONObject();
+
 
 
     @Override
@@ -33,7 +37,24 @@ public class FullHandControl extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_hand_control);
 
-        msg("Move the slider to control your Smartxa device");
+        try
+        {
+            //jsonMotors.put("motor1", 0);
+            //jsonMotors.put("motor2", 0);
+            //jsonMotors.put("motor3", 0);
+            //jsonMotors.put("motor4", 0);
+            //jsonMotors.put("motor5", 0);
+            jsonMotors.put("motor6", 1);
+            jsonMotors.put("angle", 0);
+
+        }
+        catch (Exception e)
+        {
+
+        }
+
+
+        //msg("Move the slider to control your Smartxa device");
         new ConnectBTFullHand().execute();
 
         Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
@@ -62,7 +83,7 @@ public class FullHandControl extends AppCompatActivity {
 
         });
 
-        updateAngle();
+        //updateAngle();
     }
 
     @Override
@@ -80,11 +101,21 @@ public class FullHandControl extends AppCompatActivity {
         if (textProgress != null && seekCircle != null) {
             try
             {
-            int progress = seekCircle.getProgress();
-            textProgress.setText(Integer.toString(progress) + "\u00b0");
-            btSocket.getOutputStream().write(String.valueOf("6," + progress).getBytes());
+                int progress = seekCircle.getProgress();
+                textProgress.setText(Integer.toString(progress) + "\u00b0");
+
+                try {
+                    //jsonMotors.remove("motor6");
+                    jsonMotors.remove("angle");
+                    jsonMotors.put("angle", progress);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+                btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
+                // btSocket.getOutputStream().write(String.valueOf("6," + progress).getBytes());
             }
-            catch (java.io.IOException e)
+            catch (/*java.io.IOException*/ Exception e)
             {
                 //Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             }
