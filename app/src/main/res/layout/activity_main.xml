@@ -7,30 +7,38 @@
     tools:context="com.research.deustotech.smartxa.MainActivity">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SMARTXA LOGO"
+        android:fontFamily="sans-serif"
+        android:text="SMARTXA"
+        android:textColor="@android:color/black"
+        android:textSize="40sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.218"
-        android:id="@+id/textView" />
+        app:layout_constraintVertical_bias="0.218" />
 
     <Button
         android:id="@+id/continuebutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="158dp"
+        android:layout_height="41dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:background="@android:color/holo_blue_dark"
+        android:elevation="0dp"
         android:onClick="continueButtonClicked"
         android:text="Continue"
+        android:textColor="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.863" />
+        app:layout_constraintVertical_bias="0.862"
+        tools:layout_editor_absoluteY="400dp" />
 
 </android.support.constraint.ConstraintLayout>

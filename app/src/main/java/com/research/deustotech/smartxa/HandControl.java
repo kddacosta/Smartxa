@@ -46,6 +46,9 @@ public class HandControl extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hand_control);
 
+        seek_bar = (SeekBar)findViewById(R.id.seekBar);
+        Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
+
         try
         {
             jsonMotors.put("motor1", 0);
@@ -88,9 +91,9 @@ public class HandControl extends AppCompatActivity {
 
 
     public void seekbar(/*final TextView visibility*/){
-        seek_bar = (SeekBar)findViewById(R.id.seekBar);
-        Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
-        Seekbar_Text.setText(seek_bar.getProgress() + "/" + seek_bar.getMax());
+        //seek_bar = (SeekBar)findViewById(R.id.seekBar);
+        //Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
+        Seekbar_Text.setText("0" + "/" + "100");
         int progress_value;
 
         seek_bar.setOnSeekBarChangeListener(
@@ -101,7 +104,7 @@ public class HandControl extends AppCompatActivity {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         progress_value = progress;
-                        Seekbar_Text.setText(progress + "/" + seek_bar.getMax());
+                        Seekbar_Text.setText(Integer.toString((int)(((float)seekBar.getProgress()/180.0)*100)) + "/" + "100");
                         //visibility.setAlpha(200 - 2*progress_value);
 
                         updateAngle();
@@ -113,7 +116,7 @@ public class HandControl extends AppCompatActivity {
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        Seekbar_Text.setText(progress_value + "/" + seek_bar.getMax());
+                        Seekbar_Text.setText(Integer.toString((int)(((float)seekBar.getProgress()/180.0)*100)) + "/" + "100");
 
                     }
                 }
@@ -138,6 +141,7 @@ public class HandControl extends AppCompatActivity {
             try {
                 jsonMotors.remove("motor1");
                 jsonMotors.put("motor1", 0);
+                seek_bar.setProgress(0);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -161,6 +165,7 @@ public class HandControl extends AppCompatActivity {
             try {
                 jsonMotors.remove("motor2");
                 jsonMotors.put("motor2", 0);
+                seek_bar.setProgress(0);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -184,6 +189,7 @@ public class HandControl extends AppCompatActivity {
             try {
                 jsonMotors.remove("motor3");
                 jsonMotors.put("motor3", 0);
+                seek_bar.setProgress(0);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -207,6 +213,7 @@ public class HandControl extends AppCompatActivity {
             try {
                 jsonMotors.remove("motor4");
                 jsonMotors.put("motor4", 0);
+                seek_bar.setProgress(0);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -230,6 +237,7 @@ public class HandControl extends AppCompatActivity {
             try {
                 jsonMotors.remove("motor5");
                 jsonMotors.put("motor5", 0);
+                seek_bar.setProgress(0);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -272,7 +280,7 @@ public class HandControl extends AppCompatActivity {
             try
             {
             int progress = seekBar.getProgress();
-            //textProgress.setText(Integer.toString(progress) + "\u00b0");
+            //textProgress.setText(Integer.toString(Integer.toString((int)(((float)progress/180.0)*100))) + "\u00b0");
                 try {
                     jsonMotors.remove("angle");
                     jsonMotors.put("angle", progress);

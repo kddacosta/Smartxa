@@ -1,20 +1,33 @@
 package com.research.deustotech.smartxa;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.seekcircle.SeekCircle;
 
 import android.bluetooth.*;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.UUID;
 import org.json.*;
+import java.lang.Math;
 
 //import static android.provider.Settings.Secure.ANDROID_ID;
 
@@ -30,15 +43,20 @@ public class FullHandControl extends AppCompatActivity {
 
     JSONObject jsonMotors = new JSONObject();
 
+    SeekBar seek_bar;
 
+    SeekBar seekBar;
+    TextView textProgress;
+    Button updateButton;
+    ToggleButton modeButton;
+    private String Token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_hand_control);
 
-        try
-        {
+        try {
             //jsonMotors.put("motor1", 0);
             //jsonMotors.put("motor2", 0);
             //jsonMotors.put("motor3", 0);
@@ -47,19 +65,33 @@ public class FullHandControl extends AppCompatActivity {
             jsonMotors.put("motor6", 1);
             jsonMotors.put("angle", 0);
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
 
         }
+
+
+
+        seekbar();
+
+        seekBar = (SeekBar) findViewById(R.id.seekBar2);
+        textProgress = (TextView) findViewById(R.id.textView4);
+
+        modeButton = (ToggleButton) findViewById(R.id.modeButton);
+
+        updateButton = (Button) findViewById(R.id.updatebutton);
+        updateButton.setActivated(false);
+
+        new ConnectBTFullHand().execute();
+
 
 
         //msg("Move the slider to control your Smartxa device");
-        new ConnectBTFullHand().execute();
-
-        Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
 
 
+        //Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
+
+
+        /*
         SeekCircle seekCircle = (SeekCircle) findViewById(R.id.seekCircle);
 
 
@@ -82,8 +114,75 @@ public class FullHandControl extends AppCompatActivity {
             }
 
         });
+          */
+
+
+    }
+
+    public void seekbar(/*final TextView visibility*/) {
+        seek_bar = (SeekBar) findViewById(R.id.seekBar2);
+        // Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
+        //Seekbar_Text.setText(seek_bar.getProgress() + "/" + seek_bar.getMax());
+
+        seek_bar.setOnSeekBarChangeListener(
+
+                new SeekBar.OnSeekBarChangeListener() {
+                    int progress_value;
+
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        progress_value = progress;
+                        //  Seekbar_Text.setText(progress + "/" + seek_bar.getMax());
+                        //visibility.setAlpha(200 - 2*progress_value);
+
+                        if (modeButton.isChecked())
+                        {
+                            updateAngle();
+                        }
+                        else
+                        {
+                            int seekbarProgress = seekBar.getProgress(); //seekCircle.getProgress();
+                            textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100))); /*+ "\u00b0");*/
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        //Seekbar_Text.setText(progress_value + "/" + seek_bar.getMax());
+
+                    }
+                }
+        );
+
+    }
 
         //updateAngle();
+
+
+    public void modeButtonClicked(View v)
+    {
+
+        if (modeButton.isChecked())
+        {
+            updateButton.setActivated(false);
+            Toast.makeText(getApplicationContext(), "Set to Auto control mode. Slider can be adjusted freely", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            updateButton.setActivated(true);
+            Toast.makeText(getApplicationContext(), "Set to Manual control mode. Press update to make changes", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void updateButtonClicked(View v)
+    {
+        updateAngle();
+        GetToken();
+
     }
 
     @Override
@@ -95,14 +194,15 @@ public class FullHandControl extends AppCompatActivity {
 
     private void updateAngle() {
 
-        SeekCircle seekCircle = (SeekCircle) findViewById(R.id.seekCircle);
-        TextView textProgress = (TextView) findViewById(R.id.textView4);
+        // SeekCircle seekCircle = (SeekCircle) findViewById(R.id.seekCircle);
+        // SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar2);
+        // TextView textProgress = (TextView) findViewById(R.id.textView4);
 
-        if (textProgress != null && seekCircle != null) {
+        if (textProgress != null && /*seekCircle*/seekBar != null) {
             try
             {
-                int progress = seekCircle.getProgress();
-                textProgress.setText(Integer.toString(progress) + "\u00b0");
+                int progress = seekBar.getProgress(); //seekCircle.getProgress();
+                textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100))); /*+ "\u00b0");*/
 
                 try {
                     //jsonMotors.remove("motor6");
@@ -145,6 +245,170 @@ public class FullHandControl extends AppCompatActivity {
     {
         Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
+
+
+    private void sendData() {
+
+        final SeekBar seekProgress = (SeekBar) findViewById(R.id.seekBar2);
+
+        new Thread(new Runnable() {
+            public void run() {
+
+                InputStream in = null;
+                OutputStream out = null;
+                String reply = "";
+
+                try {
+                    String url = "http://10.32.8.79/sesion/api/";
+                    URL object=new URL(url);
+
+                    HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                    con.setRequestProperty("Content-Type", /*"text/html*/"application/json; charset=UTF-8");
+                    con.setRequestMethod("POST");
+                    con.setDoOutput(true);
+                    //con.setDoInput(true);
+
+                    JSONObject json = new JSONObject();
+                    //System.out.println("test " + _username.toString());
+                    //json.put("username", "test");
+                    //json.put("password","prueba1234");
+                    //String httpPost = command;
+                    json.put("fecha", "2017-11-02");
+                    json.put("pulgar", 0);
+                    json.put("indice", 0 );
+                    json.put("medio", 0);
+                    json.put("anular", 0);
+                    json.put("menique", 0);
+                    json.put("total", seekProgress.getProgress() );
+                    json.put("username", "test" );
+                    json.put("paciente", "Antonio Gonzalez" );
+                    json.put("token", Token);
+                    //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
+                    out = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+                    writer.write(json.toString());
+                    writer.flush();
+                    writer.close();
+                    out.close();
+
+                    // If we're interested in the reply...
+                    int respCode = con.getResponseCode();
+                    System.out.println("Data send response code " + respCode);
+
+
+                    if (respCode == HttpURLConnection.HTTP_OK) {
+
+
+                        System.out.println("Successfully sent data");
+                        /*
+                        String line;
+                        in = con.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        while ((line = reader.readLine()) != null) {
+                            reply += line;
+                        }
+
+                        reader.close();
+                        in.close();
+
+                        // Display the returned JSON in a text box, just for confirmation.
+                        // Code not necessary for this example
+                        //tv.setText(reply);
+                        System.out.println("\nresponse content " + reply);
+                        Token = reply;
+                        //startActivity(new Intent(LoginScreen.this, Home.class));
+                        */
+                    } else {
+                        //Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
+                        //tv.setText("Failed to connect: " + respCode);
+                        System.out.println("Failed to send data");
+                    }
+
+
+                    con.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
+
+
+
+    private void GetToken() {
+
+        new Thread(new Runnable() {
+            public void run() {
+
+                InputStream in = null;
+                OutputStream out = null;
+                String reply = "";
+
+                try {
+                    String url = "http://10.32.8.79/sesion/api/login";
+                    URL object=new URL(url);
+
+                    HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                    con.setRequestProperty("Content-Type", "text/html;charset=UTF-8");
+                    con.setRequestMethod("POST");
+                    con.setDoOutput(true);
+                    //con.setDoInput(true);
+
+                    JSONObject json = new JSONObject();
+                    //System.out.println("test " + _username.toString());
+                    json.put("username", "test");
+                    json.put("password","prueba1234");
+                    //String httpPost = command;
+
+                    out = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+                    writer.write(json.toString());
+                    writer.flush();
+                    writer.close();
+                    out.close();
+
+                    // If we're interested in the reply...
+                    int respCode = con.getResponseCode();
+                    System.out.println("response code " + respCode);
+
+
+                    if (respCode == HttpURLConnection.HTTP_OK) {
+
+                        String line;
+                        in = con.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        while ((line = reader.readLine()) != null) {
+                            reply += line;
+                        }
+
+                        reader.close();
+                        in.close();
+
+                        // Display the returned JSON in a text box, just for confirmation.
+                        // Code not necessary for this example
+                        //tv.setText(reply);
+                        System.out.println("\nresponse content " + reply);
+                        Token = reply;
+
+                        sendData();
+                        //startActivity(new Intent(LoginScreen.this, Home.class));
+                    } else {
+                        //Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
+                        //tv.setText("Failed to connect: " + respCode);
+                    }
+
+
+                    con.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
+
+
 
     private class ConnectBTFullHand extends AsyncTask<Void, Void, Void>  // UI thread
     {

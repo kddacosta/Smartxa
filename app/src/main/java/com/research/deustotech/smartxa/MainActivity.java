@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     public static String smarxaDeviceName;
     public static String smartxaAddress;
     public static Dictionary<String,String> smartxaDevice;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         //BlueTooth smartxaBluetooth = new BlueTooth();
         //smartxaBluetooth.bluetooth = BluetoothAdapter.getDefaultAdapter();
 
+        startActivity(new Intent(MainActivity.this, LoginScreen.class));
 
         if(bluetooth != null)
         {
