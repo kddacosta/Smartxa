@@ -55,7 +55,10 @@ public class LoginScreen extends AppCompatActivity {
             //userProfile.setUsername(username);
             //userProfile.setPassword(password);
 
-            sendCommand(username, password);
+            //sendCommand(username, password);
+
+            startActivity(new Intent(LoginScreen.this, Home.class));
+
             //request.execute();
             //loginButton.setActivated(true);
             //Toast.makeText(getApplicationContext(),"continued",Toast.LENGTH_LONG).show();

@@ -37,13 +37,15 @@ public class FullHandControl extends AppCompatActivity {
     private boolean isBtConnected = false;
     BluetoothAdapter myBluetooth;
 
-    BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter(); //null;
+    BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
     private String address = MainActivity.smartxaAddress;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //"00001101-0000-1000-8000-00805F9B34FB"
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     JSONObject jsonMotors = new JSONObject();
 
     SeekBar seek_bar;
+
+    BlueTooth _bluetooth_ctrl;
 
     SeekBar seekBar;
     TextView textProgress;
@@ -81,48 +83,13 @@ public class FullHandControl extends AppCompatActivity {
         updateButton = (Button) findViewById(R.id.updatebutton);
         updateButton.setActivated(false);
 
-        new ConnectBTFullHand().execute();
-
-
-
-        //msg("Move the slider to control your Smartxa device");
-
-
-        //Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
-
-
-        /*
-        SeekCircle seekCircle = (SeekCircle) findViewById(R.id.seekCircle);
-
-
-
-
-        seekCircle.setOnSeekCircleChangeListener(new SeekCircle.OnSeekCircleChangeListener() {
-
-            @Override
-            public void onStopTrackingTouch(SeekCircle seekCircle) {
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekCircle seekCircle) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekCircle seekCircle, int progress, boolean fromUser) {
-
-                updateAngle();
-            }
-
-        });
-          */
-
-
+        //new ConnectBTFullHand().execute();
+        _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
     }
 
     public void seekbar(/*final TextView visibility*/) {
         seek_bar = (SeekBar) findViewById(R.id.seekBar2);
-        // Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
-        //Seekbar_Text.setText(seek_bar.getProgress() + "/" + seek_bar.getMax());
+
 
         seek_bar.setOnSeekBarChangeListener(
 
@@ -194,26 +161,22 @@ public class FullHandControl extends AppCompatActivity {
 
     private void updateAngle() {
 
-        // SeekCircle seekCircle = (SeekCircle) findViewById(R.id.seekCircle);
-        // SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar2);
-        // TextView textProgress = (TextView) findViewById(R.id.textView4);
-
-        if (textProgress != null && /*seekCircle*/seekBar != null) {
+        if (textProgress != null && seekBar != null) {
             try
             {
-                int progress = seekBar.getProgress(); //seekCircle.getProgress();
-                textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100))); /*+ "\u00b0");*/
+                int progress = seekBar.getProgress();
+                textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100)));
 
                 try {
-                    //jsonMotors.remove("motor6");
                     jsonMotors.remove("angle");
                     jsonMotors.put("angle", progress);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
 
-                btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
-                // btSocket.getOutputStream().write(String.valueOf("6," + progress).getBytes());
+                _bluetooth_ctrl.btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
+                //btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
+
             }
             catch (/*java.io.IOException*/ Exception e)
             {
@@ -234,7 +197,7 @@ public class FullHandControl extends AppCompatActivity {
             }
             catch (IOException e)
             {
-                msg("Error");
+                //msg("Error");
             }
         }
         finish(); //return to the first layout
@@ -280,9 +243,9 @@ public class FullHandControl extends AppCompatActivity {
                     json.put("anular", 0);
                     json.put("menique", 0);
                     json.put("total", seekProgress.getProgress() );
-                    json.put("username", "test" );
+                    json.put("username", "carlos" );
                     json.put("paciente", "Antonio Gonzalez" );
-                    json.put("token", Token);
+                    json.put("token", Token.replace("\"",""));
                     //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
@@ -300,7 +263,7 @@ public class FullHandControl extends AppCompatActivity {
 
 
                         System.out.println("Successfully sent data");
-                        /*
+
                         String line;
                         in = con.getInputStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -315,9 +278,10 @@ public class FullHandControl extends AppCompatActivity {
                         // Code not necessary for this example
                         //tv.setText(reply);
                         System.out.println("\nresponse content " + reply);
-                        Token = reply;
+                        System.out.println("Token from request" + Token.toString());
+                       // String resp = reply;
                         //startActivity(new Intent(LoginScreen.this, Home.class));
-                        */
+
                     } else {
                         //Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
                         //tv.setText("Failed to connect: " + respCode);
@@ -357,8 +321,8 @@ public class FullHandControl extends AppCompatActivity {
 
                     JSONObject json = new JSONObject();
                     //System.out.println("test " + _username.toString());
-                    json.put("username", "test");
-                    json.put("password","prueba1234");
+                    json.put("username", "carlos");
+                    json.put("password","numero1234");
                     //String httpPost = command;
 
                     out = con.getOutputStream();
@@ -389,7 +353,7 @@ public class FullHandControl extends AppCompatActivity {
                         // Code not necessary for this example
                         //tv.setText(reply);
                         System.out.println("\nresponse content " + reply);
-                        Token = reply;
+                        Token = reply.toString();
 
                         sendData();
                         //startActivity(new Intent(LoginScreen.this, Home.class));
@@ -409,7 +373,7 @@ public class FullHandControl extends AppCompatActivity {
     }
 
 
-
+    // No longer being used
     private class ConnectBTFullHand extends AsyncTask<Void, Void, Void>  // UI thread
     {
         /*
