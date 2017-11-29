@@ -1,13 +1,19 @@
 package com.research.deustotech.smartxa;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.LabeledIntent;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.bluetooth.*;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,15 +35,20 @@ public class MainActivity extends AppCompatActivity {
     public static Dictionary<String,String> smartxaDevice;
     public static BlueTooth bluetooth_ctrl;
     ProgressBar loadBar;
+    public static Button continueBtn;
+
+    public static Context mainActivityContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mainActivityContext = getApplicationContext();
         setContentView(R.layout.activity_main);
         //loadBar = (ProgressBar) findViewById(R.id.progressBar_load);
         //loadBar.setAlpha(0);
         //BlueTooth.Disconnect();
+        continueBtn = (Button) findViewById(R.id.continuebutton);
 
     }
 
@@ -45,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void continueButtonClicked(View v)
     {
+
+
+        //Toast.makeText(MainActivity.this, "Connecting to SmartXa. Please wait...", Toast.LENGTH_SHORT).show();
+        //try{ Thread.sleep(3000); }catch(InterruptedException e){ }
+        //Toast.makeText(getApplicationContext(), "Connecting to SmartXa. Please wait...", Toast.LENGTH_LONG).show();
         //startActivity(new Intent(MainActivity.this, LoginScreen.class));
 
         //BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
@@ -58,9 +74,6 @@ public class MainActivity extends AppCompatActivity {
         if(bluetooth != null)
         {
 
-            // Continue with bluetooth setup.
-            //Toast.makeText(this, "Device is bluetooth capable", Toast.LENGTH_LONG).show();
-
             String status;
             if (bluetooth.isEnabled()) {
                 String mydeviceaddress = bluetooth.getAddress();
@@ -72,25 +85,15 @@ public class MainActivity extends AppCompatActivity {
                 //Toast.makeText(this, status, Toast.LENGTH_LONG).show();
                 createPairedDevicesList();
 
-                bluetooth_ctrl = new BlueTooth();
-                bluetooth_ctrl.ConnectBlueTooth();
-
-                //loadBar.setAlpha(1);
-/*
+                /*
                 new Thread(new Runnable() {
                     public void run() {
 
-                        System.out.println("Starting new bluetooth thread");
-
-                        boolean ConnectSuccess = true;
+                        System.out.println("Starting new bluetooth Toast Thread");
 
                         try
                         {
-                            for (int i = 0; i <=100; i++)
-                            {
-                                loadBar.setProgress(i);
-                                Thread.sleep(40);
-                            }
+                            Toast.makeText(getApplicationContext(), "Connecting to SmartXa. Please wait...", Toast.LENGTH_LONG).show();
                         }
                         catch (Exception e) {
                             e.printStackTrace();
@@ -99,37 +102,70 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
 */
 
-                try{ Thread.sleep(4000); }catch(InterruptedException e){ }
-                //loadBar.setAlpha(0);
-                if (bluetooth_ctrl.isBtConnected)
-                {
-                    Toast.makeText(this, "Successfully connected to SmartXa.", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(MainActivity.this, LoginScreen.class));
-                }
-                else
-                {
-                    Toast.makeText(this, "Failed to communicate with SmartXa. Verify that your device is powered on, then press \'Continue\'" +
-                            "to try again.", Toast.LENGTH_LONG).show();
-                }
+                continueBtn.setClickable(false);
+
+                bluetooth_ctrl = new BlueTooth();
+                bluetooth_ctrl.ConnectBlueTooth();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (!isFinishing()){
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("Contacting Smartxa")
+                                    .setMessage("Please wait...")
+                                    .setCancelable(false)
+                                    .setPositiveButton("Conectar", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Whatever...
+                                            try{ Thread.sleep(3000); }catch(InterruptedException e){ }
+                                            if (bluetooth_ctrl.isBtConnected)
+                                            {
+                                                //Toast.makeText(this, "Successfully connected to SmartXa.", Toast.LENGTH_SHORT).show();
+                                                startActivity(new Intent(MainActivity.this, LoginScreen.class));
+                                            }
+                                            else
+                                            {
+                                                Handler mainHandler = new Handler(mainActivityContext.getMainLooper());
+
+                                                Runnable myRunnable = new Runnable() {
+                                                    @Override
+                                                    public void run()
+                                                    {
+                                                        Toast.makeText(mainActivityContext, "Failed to communicate with SmartXa. Verify that your device is powered on, " +
+                                                                "then press \"Continue\" to try again.", Toast.LENGTH_SHORT).show();
+                                                        //try{ Thread.sleep(4000); }catch(InterruptedException e){ }
+                                                    } // This is your code
+                                                };
+
+                                                mainHandler.post(myRunnable);
+
+                                                //Toast.makeText(mainActivityContext,"Failed to communicate with SmartXa. Verify that your device is powered on, then press \\'Continue\\'\" +\n" +
+                                                //        "\" to try again.",Toast.LENGTH_LONG);
+
+                                            }
+                                        }
+                                    }).show();
+                        }
+                    }
+                });
+
+
             }
             else
             {
                 Intent turnBTon = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 status = "BlueTooth is disabled. Smartxa is enabling bluetooth on your device.";
-                //Toast.makeText(getApplicationContext(), status, Toast.LENGTH_LONG).show();
                 startActivityForResult(turnBTon,1);
-
-                //bluetooth.enable();
-
                 //startActivity(new Intent(MainActivity.this, LoginScreen.class));
             }
 
-
-
             //bluetooth.listenUsingRfcommWithServiceRecord("raspberrypi", new UUID());
 
-
         }
+
         else
         {
             Toast.makeText(this, "This device is not bluetooth capable", Toast.LENGTH_LONG).show();
@@ -138,6 +174,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public void openLoginScreen()
+    {
+        startActivity(new Intent(MainActivity.this, LoginScreen.class));
+    }
 
 
     private void createPairedDevicesList()
@@ -154,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 smarxaDeviceName = bt.getName();
                 smartxaAddress = bt.getAddress();
 
-                Toast.makeText(getApplicationContext(),"Paired Device: " + bt.getName() + " " + bt.getAddress(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"Paired Device: " + bt.getName() + " " + bt.getAddress(), Toast.LENGTH_SHORT).show();
             }
 
         }

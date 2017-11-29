@@ -1,0 +1,10 @@
+<resources>
+    <string name="test">test</string>
+    <string-array name="spinneritems">
+        <item>None</item>
+        <item>Relapsing Remitting (RRMS)</item>
+        <item>Primary Progressive (PPMS)</item>
+        <item>Progressive Relapsing (PRMS)</item>
+        <item>Secondary Progressive (SPMS)</item>
+    </string-array>
+</resources>

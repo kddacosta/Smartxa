@@ -1,11 +1,17 @@
 package com.research.deustotech.smartxa;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +31,16 @@ public class LoginScreen extends AppCompatActivity {
     private String username;
     private String password;
     private String response;
+    //public static String patientsName;
+    //public static String doctorsName;
 
     Button loginButton;
     RequestTokenTask request;
+
+    TextView patientName;
+    TextView doctorName;
+    Spinner stage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +49,7 @@ public class LoginScreen extends AppCompatActivity {
 
         loginButton = (Button) findViewById(R.id.authbutton);
 
+        // Create an instance of the async task -- not executed yet
         request = new RequestTokenTask();
         //request.execute();
     }
@@ -43,43 +57,123 @@ public class LoginScreen extends AppCompatActivity {
 
     public void loginButtonClicked(View v)
     {
+        // Reference the textviews by Id
+        patientName = (TextView) findViewById(R.id.patientNameText);
+        doctorName = (TextView) findViewById(R.id.doctorNameText);
+        stage = (Spinner) findViewById(R.id.spinner2);
 
-        try
+        // Show warning dialogs if the patient or doctor name text views are empty
+        if (patientName.getText().toString().isEmpty())
         {
-            TextView user = (TextView) findViewById(R.id.UsernameText);
-            TextView pass = (TextView) findViewById(R.id.PasswordText2);
-            username = user.getText().toString();
-            password = pass.getText().toString();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
 
-            //UserProfile userProfile = new UserProfile();
-            //userProfile.setUsername(username);
-            //userProfile.setPassword(password);
-
-            //sendCommand(username, password);
-
-            startActivity(new Intent(LoginScreen.this, Home.class));
-
-            //request.execute();
-            //loginButton.setActivated(true);
-            //Toast.makeText(getApplicationContext(),"continued",Toast.LENGTH_LONG).show();
-            //startActivity(new Intent(LoginScreen.this, Home.class));
-
-            // TODO: POST request to get auth token from api
-            // store token in var
-            // Use token in app to send data to api
+                    if (!isFinishing()){
+                        new AlertDialog.Builder(LoginScreen.this)
+                                .setTitle("Invalid Information")
+                                .setMessage("Please enter the name of the patient.")
+                                .setCancelable(false)
+                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Whatever...
+                                        patientName.setHintTextColor(Color.RED);
+                                    }
+                                }).show();
+                    }
+                }
+            });
 
         }
-        catch (Exception e)
+        else if (doctorName.getText().toString().isEmpty())
         {
-            System.out.println("Failed" + e);
-            // log error. failed to communicate with api: + e
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (!isFinishing()){
+                        new AlertDialog.Builder(LoginScreen.this)
+                                .setTitle("Invalid Information")
+                                .setMessage("Please enter the name of the doctor.")
+                                .setCancelable(false)
+                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Whatever...
+                                        doctorName.setHintTextColor(Color.RED);
+                                    }
+                                }).show();
+                    }
+                }
+            });
+        }
+        else
+        {
+
+
+            try
+            {
+
+                username = doctorName.getText().toString();
+
+                showInputDialog();
+
+
+                // Store the user entered data in publically accessible vars
+
+                UserProfile.setPatientsName(patientName.getText().toString());
+                UserProfile.setDoctorsName(doctorName.getText().toString());
+                UserProfile.setPatientStage(stage.getSelectedItem().toString());
+
+
+                //TODO: uncomment this line to send the api request
+                //sendCommand("carlos","numero1234");
+                //sendCommand(username, password);
+
+                startActivity(new Intent(LoginScreen.this, Home.class));
+
+            } catch (Exception e) {
+                System.out.println("Failed" + e);
+                // log error. failed to communicate with api: + e
+            }
         }
     }
 
 
+    protected void showInputDialog() {
+
+        // get prompts.xml view
+        LayoutInflater layoutInflater = LayoutInflater.from(LoginScreen.this);
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginScreen.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.edittext);
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        password = editText.getText().toString();
+
+                        sendCommand(username, password);
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
 
 
 
+    // This method sends an http request to the api. It receives a token response
     private void sendCommand(final String _username, final String _password) {
         new Thread(new Runnable() {
             public void run() {

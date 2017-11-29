@@ -254,7 +254,8 @@ public class HandControl extends AppCompatActivity {
     protected void onPause()
     {
         super.onPause();
-        Disconnect();
+        //Disconnect();
+
     }
 
 

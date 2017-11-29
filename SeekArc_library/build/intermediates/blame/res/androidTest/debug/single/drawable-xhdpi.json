@@ -36,12 +36,12 @@
         "source": "/Users/Kori/.android/build-cache/8db271802a5ce1363f9697490f8a8ff17e8a140b/output/res/drawable-xhdpi/abc_list_selector_disabled_holo_light.9.png"
     },
     {
-        "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi/abc_list_pressed_holo_dark.9.png",
-        "source": "/Users/Kori/.android/build-cache/8db271802a5ce1363f9697490f8a8ff17e8a140b/output/res/drawable-xhdpi/abc_list_pressed_holo_dark.9.png"
-    },
-    {
         "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi/abc_btn_switch_to_on_mtrl_00012.9.png",
         "source": "/Users/Kori/.android/build-cache/8db271802a5ce1363f9697490f8a8ff17e8a140b/output/res/drawable-xhdpi/abc_btn_switch_to_on_mtrl_00012.9.png"
+    },
+    {
+        "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi/abc_list_pressed_holo_dark.9.png",
+        "source": "/Users/Kori/.android/build-cache/8db271802a5ce1363f9697490f8a8ff17e8a140b/output/res/drawable-xhdpi/abc_list_pressed_holo_dark.9.png"
     },
     {
         "merged": "/Users/Kori/AndroidStudioProjects/Smartxa/SeekArc_library/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi/abc_btn_rating_star_off_mtrl_alpha.png",

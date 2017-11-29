@@ -56,7 +56,7 @@
         android:layout_marginTop="8dp"
         android:background="@android:color/holo_blue_dark"
         android:onClick="ProfileButtonClick"
-        android:text="Profile"
+        android:text="MySmartxa Profile"
         android:textColor="@android:color/holo_orange_light"
         android:textSize="20sp"
         android:textStyle="bold"

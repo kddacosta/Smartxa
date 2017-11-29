@@ -45,6 +45,8 @@ public class FullHandControl extends AppCompatActivity {
 
     SeekBar seek_bar;
 
+    public int seekBarMax = 0;
+
     BlueTooth _bluetooth_ctrl;
 
     SeekBar seekBar;
@@ -87,6 +89,9 @@ public class FullHandControl extends AppCompatActivity {
         _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
     }
 
+
+    //TODO: Create new thread. Pause thread. Send data every minute or 10 seconds or something
+    // calculate the max of the progress bar
     public void seekbar(/*final TextView visibility*/) {
         seek_bar = (SeekBar) findViewById(R.id.seekBar2);
 
@@ -104,12 +109,29 @@ public class FullHandControl extends AppCompatActivity {
 
                         if (modeButton.isChecked())
                         {
+                            //final SeekBar seekProgress = (SeekBar) findViewById(R.id.seekBar2);
+                            //int progress = seekProgress.getProgress();
                             updateAngle();
+
+                            if (progress > seekBarMax)
+                            {
+                                seekBarMax = progress;
+                                //GetToken();
+                            }
+
                         }
                         else
                         {
-                            int seekbarProgress = seekBar.getProgress(); //seekCircle.getProgress();
-                            textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100))); /*+ "\u00b0");*/
+                           // int seekbarProgress = seekBar.getProgress(); //seekCircle.getProgress();
+                           // textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100))); /*+ "\u00b0");*/
+
+                            updateAngle();
+                            if (progress > seekBarMax)
+                            {
+                                seekBarMax = progress;
+                                //GetToken();
+                            }
+
                         }
                     }
 
@@ -148,7 +170,7 @@ public class FullHandControl extends AppCompatActivity {
     public void updateButtonClicked(View v)
     {
         updateAngle();
-        GetToken();
+        //GetToken();
 
     }
 
@@ -156,10 +178,13 @@ public class FullHandControl extends AppCompatActivity {
     protected void onPause()
     {
         super.onPause();
-        Disconnect();
+        //Disconnect();
+
+        GetToken();
     }
 
     private void updateAngle() {
+
 
         if (textProgress != null && seekBar != null) {
             try
@@ -214,8 +239,14 @@ public class FullHandControl extends AppCompatActivity {
 
         final SeekBar seekProgress = (SeekBar) findViewById(R.id.seekBar2);
 
+        int progress = seekProgress.getProgress();
+        //if (progress > seekBarMax)
+       // {
+           // seekBarMax = progress;
+
         new Thread(new Runnable() {
             public void run() {
+
 
                 InputStream in = null;
                 OutputStream out = null;
@@ -236,7 +267,7 @@ public class FullHandControl extends AppCompatActivity {
                     //json.put("username", "test");
                     //json.put("password","prueba1234");
                     //String httpPost = command;
-                    json.put("fecha", "2017-11-02");
+                    json.put("fecha", "2017-11-28");
                     json.put("pulgar", 0);
                     json.put("indice", 0 );
                     json.put("medio", 0);
@@ -246,6 +277,7 @@ public class FullHandControl extends AppCompatActivity {
                     json.put("username", "carlos" );
                     json.put("paciente", "Antonio Gonzalez" );
                     json.put("token", Token.replace("\"",""));
+                    //json.put("etapa", "");
                     //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
@@ -279,7 +311,7 @@ public class FullHandControl extends AppCompatActivity {
                         //tv.setText(reply);
                         System.out.println("\nresponse content " + reply);
                         System.out.println("Token from request" + Token.toString());
-                       // String resp = reply;
+                        // String resp = reply;
                         //startActivity(new Intent(LoginScreen.this, Home.class));
 
                     } else {
@@ -296,11 +328,17 @@ public class FullHandControl extends AppCompatActivity {
 
             }
         }).start();
+
+        //}
+
     }
 
 
 
     private void GetToken() {
+
+
+        // TODO: If token response is expired, then request a token again
 
         new Thread(new Runnable() {
             public void run() {
@@ -354,6 +392,8 @@ public class FullHandControl extends AppCompatActivity {
                         //tv.setText(reply);
                         System.out.println("\nresponse content " + reply);
                         Token = reply.toString();
+
+                        // Token = "";
 
                         sendData();
                         //startActivity(new Intent(LoginScreen.this, Home.class));
