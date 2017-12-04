@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.LabeledIntent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -18,11 +19,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.paolorotolo.appintro.*;
+import com.rubengees.introduction.IntroductionBuilder;
+import com.rubengees.introduction.Slide;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.prefs.Preferences;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,9 +57,68 @@ public class MainActivity extends AppCompatActivity {
         //BlueTooth.Disconnect();
         continueBtn = (Button) findViewById(R.id.continuebutton);
 
+
+
+        //TODO: adding an intro page to the application
+        SharedPreferences sp = getSharedPreferences( "Smartxa_Preferences", Context.MODE_PRIVATE);
+
+        if (!sp.getBoolean("second", false)) {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putBoolean("second", true);
+
+            editor.apply();
+            editor.commit();
+
+            //new IntroductionBuilder(this);
+            //new IntroductionBuilder(this).withSlides(generateSlides());
+            new IntroductionBuilder(this).withSlides(generateSlides()).introduceMyself();
+
+            //Intent intent = new Intent(this, IntroSlides.class); // Call the AppIntro java class
+            //startActivity(intent);
+
+            //TODO: remove after testing
+            editor.remove("second");
+            editor.clear();
+            editor.apply();
+            editor.commit();
+        }
+
     }
 
 
+    private List<Slide> generateSlides() {
+        List<Slide> result = new ArrayList<>();
+
+        result.add(new Slide()
+                .withTitle("Some title")
+                .withDescription("Some description").
+                        withColorResource(R.color.green)
+                //.withImage(R.drawable.myImage)
+        );
+
+        result.add(new Slide()
+                        .withTitle("Another title")
+                        .withDescription("Another description")
+                        .withColorResource(R.color.indigo)
+                //.withImage(R.drawable.myImage2)
+        );
+
+        result.add(new Slide()
+                        .withTitle("Some title")
+                        .withDescription("Some description").
+                                withColorResource(R.color.colorPrimary)
+                //.withImage(R.drawable.myImage)
+        );
+
+        result.add(new Slide()
+                        .withTitle("Another title")
+                        .withDescription("Another description")
+                        .withColorResource(R.color.red)
+                //.withImage(R.drawable.myImage2)
+        );
+
+        return result;
+    }
 
     public void continueButtonClicked(View v)
     {
@@ -71,6 +137,9 @@ public class MainActivity extends AppCompatActivity {
 
         //startActivity(new Intent(MainActivity.this, LoginScreen.class));
 
+        //startActivity(new Intent(MainActivity.this, AppIntro.class));
+        //TODO: This is the main function to execute. uncomment after testing.
+
         if(bluetooth != null)
         {
 
@@ -85,23 +154,6 @@ public class MainActivity extends AppCompatActivity {
                 //Toast.makeText(this, status, Toast.LENGTH_LONG).show();
                 createPairedDevicesList();
 
-                /*
-                new Thread(new Runnable() {
-                    public void run() {
-
-                        System.out.println("Starting new bluetooth Toast Thread");
-
-                        try
-                        {
-                            Toast.makeText(getApplicationContext(), "Connecting to SmartXa. Please wait...", Toast.LENGTH_LONG).show();
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-*/
-
                 continueBtn.setClickable(false);
 
                 bluetooth_ctrl = new BlueTooth();
@@ -114,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         if (!isFinishing()){
                             new AlertDialog.Builder(MainActivity.this)
                                     .setTitle("Contacting Smartxa")
-                                    .setMessage("Please wait...")
+                                    .setMessage("Press 'Conectar' to continue")
                                     .setCancelable(false)
                                     .setPositiveButton("Conectar", new DialogInterface.OnClickListener() {
                                         @Override
@@ -171,6 +223,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "This device is not bluetooth capable", Toast.LENGTH_LONG).show();
 
         }
+
+
 
     }
 

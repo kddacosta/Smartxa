@@ -18,7 +18,9 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -60,7 +62,9 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="@+id/imageView"
         app:layout_constraintHorizontal_bias="0.57"
-        app:layout_constraintVertical_bias="0.050000012" />
+        app:layout_constraintVertical_bias="0.050000012"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageButton
         android:id="@+id/finger4"
@@ -81,7 +85,9 @@
         app:layout_constraintRight_toRightOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.075"
-        app:srcCompat="@drawable/finger4" />
+        app:srcCompat="@drawable/finger4"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageButton
         android:id="@+id/finger5"
@@ -103,8 +109,8 @@
         android:layout_marginTop="8dp"
         app:layout_constraintHorizontal_bias="0.901"
         app:layout_constraintVertical_bias="0.308"
-        tools:layout_editor_absoluteY="123dp"
-        tools:layout_editor_absoluteX="286dp" />
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageButton
         android:id="@+id/finger2"
@@ -125,7 +131,9 @@
         android:layout_marginLeft="15dp"
         app:layout_constraintLeft_toLeftOf="@+id/finger1"
         app:layout_constraintHorizontal_bias="0.305"
-        app:layout_constraintRight_toRightOf="@+id/imageView" />
+        app:layout_constraintRight_toRightOf="@+id/imageView"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageButton
         android:id="@+id/finger1"
@@ -148,8 +156,79 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.586"
-        app:srcCompat="@drawable/finger0" />
+        app:srcCompat="@drawable/finger0"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="8dp" />
 
+<!--
+    <com.ogaclejapan.arclayout.ArcLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:arc_axisRadius="120dp"
+        app:arc_color="#4D000000"
+        app:arc_freeAngle="false"
+        app:arc_origin="bottom"
+        app:arc_radius="168dp"
+        app:arc_reverseAngle="false"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="1.0">
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#03A9F4"
+            android:gravity="center"
+            android:text="Thumb"
+            android:textColor="#FFFFFF"
+            app:arc_origin="center" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#00BCD4"
+            android:gravity="center"
+            android:text="Index"
+            android:textColor="#FFFFFF"
+            app:arc_origin="center" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#009688"
+            android:gravity="center"
+            android:text="Middle"
+            android:textColor="#FFFFFF"
+            app:arc_origin="center" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@color/yellow"
+            android:gravity="center"
+            android:text="Ring"
+            android:textColor="#FFFFFF"
+            app:arc_origin="center" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@color/red"
+            android:gravity="center"
+            android:text="Pinky"
+            android:textColor="#FFFFFF"
+            app:arc_origin="center"
+            />
+
+    </com.ogaclejapan.arclayout.ArcLayout>
+-->
     <TextView
         android:id="@+id/SeekbarText"
         android:layout_width="wrap_content"
@@ -164,6 +243,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.88" />
+        app:layout_constraintVertical_bias="0.88"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,7 +1,7 @@
 <resources>
     <string name="test">test</string>
     <string-array name="spinneritems">
-        <item>None</item>
+        <item>Default (MS)</item>
         <item>Relapsing Remitting (RRMS)</item>
         <item>Primary Progressive (PPMS)</item>
         <item>Progressive Relapsing (PRMS)</item>

@@ -1,13 +1,18 @@
 package com.research.deustotech.smartxa;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.seekcircle.SeekCircle;
@@ -25,6 +30,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import org.json.*;
 import java.lang.Math;
@@ -55,6 +63,8 @@ public class FullHandControl extends AppCompatActivity {
     ToggleButton modeButton;
     private String Token;
 
+    Switch modeSwitch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,23 +85,83 @@ public class FullHandControl extends AppCompatActivity {
 
 
 
-        seekbar();
 
+        // Create object references
         seekBar = (SeekBar) findViewById(R.id.seekBar2);
         textProgress = (TextView) findViewById(R.id.textView4);
-
-        modeButton = (ToggleButton) findViewById(R.id.modeButton);
-
-        updateButton = (Button) findViewById(R.id.updatebutton);
-        updateButton.setActivated(false);
-
+        //modeButton = (ToggleButton) findViewById(R.id.modeButton);
+        //updateButton = (Button) findViewById(R.id.updatebutton);
+        //updateButton.setActivated(false);
         //new ConnectBTFullHand().execute();
         _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
+
+        // Initiate listener functions
+        seekbar();
+        switchBarListener();
+
+        // Prompt the user to select a control mode
+        showModeDialog();
+
+
     }
 
 
-    //TODO: Create new thread. Pause thread. Send data every minute or 10 seconds or something
-    // calculate the max of the progress bar
+    public void showModeDialog()
+    {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (!isFinishing()){
+                    new AlertDialog.Builder(FullHandControl.this)
+                            .setTitle("Full Hand Control")
+                            .setMessage("Select a Mode to get started.")
+                            .setCancelable(false)
+                            .setPositiveButton("Enter Freemode", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+
+                            })
+                            .setNegativeButton("Start a Test",new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    modeSwitch.setChecked(true);
+                                }
+                            }).show();
+
+                }
+            }
+        });
+    }
+
+
+    public void switchBarListener()
+    {
+        modeSwitch = (Switch) findViewById(R.id.modeSwitch);
+
+        modeSwitch.setOnCheckedChangeListener(
+                new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                        if (modeSwitch.isChecked())
+                        {
+                            System.out.println("mode is checked");
+                            // is checked == test mode
+                        }
+                        else
+                        {
+                            System.out.println("mode is not checked");
+                            // is not checked == free mode
+                        }
+                    }
+                }
+        );
+    }
+
+
     public void seekbar(/*final TextView visibility*/) {
         seek_bar = (SeekBar) findViewById(R.id.seekBar2);
 
@@ -107,32 +177,33 @@ public class FullHandControl extends AppCompatActivity {
                         //  Seekbar_Text.setText(progress + "/" + seek_bar.getMax());
                         //visibility.setAlpha(200 - 2*progress_value);
 
-                        if (modeButton.isChecked())
-                        {
+                        //if (modeButton.isChecked())
+                        //{
                             //final SeekBar seekProgress = (SeekBar) findViewById(R.id.seekBar2);
                             //int progress = seekProgress.getProgress();
-                            updateAngle();
 
-                            if (progress > seekBarMax)
-                            {
-                                seekBarMax = progress;
-                                //GetToken();
-                            }
-
-                        }
-                        else
+                        updateAngle();
+                        if (progress >= seekBarMax)
                         {
+                            seekBarMax = progress;
+                            //GetToken();
+                        }
+
+                        //}
+                        //else
+                        //{
                            // int seekbarProgress = seekBar.getProgress(); //seekCircle.getProgress();
                            // textProgress.setText(Integer.toString((int)(((float)progress/180.0)*100))); /*+ "\u00b0");*/
 
-                            updateAngle();
-                            if (progress > seekBarMax)
-                            {
-                                seekBarMax = progress;
-                                //GetToken();
-                            }
-
+                        /*
+                        updateAngle();
+                        if (progress >= seekBarMax)
+                        {
+                            seekBarMax = progress;
+                            //GetToken();
                         }
+                        */
+                        //}
                     }
 
                     @Override
@@ -149,12 +220,15 @@ public class FullHandControl extends AppCompatActivity {
 
     }
 
-        //updateAngle();
 
 
+
+
+    // Deprecated
     public void modeButtonClicked(View v)
     {
 
+        /*
         if (modeButton.isChecked())
         {
             updateButton.setActivated(false);
@@ -165,7 +239,9 @@ public class FullHandControl extends AppCompatActivity {
             updateButton.setActivated(true);
             Toast.makeText(getApplicationContext(), "Set to Manual control mode. Press update to make changes", Toast.LENGTH_LONG).show();
         }
+        */
     }
+
 
     public void updateButtonClicked(View v)
     {
@@ -183,6 +259,7 @@ public class FullHandControl extends AppCompatActivity {
         GetToken();
     }
 
+    // Send bluetooth data to the raspberry pi: which motor, and the angle
     private void updateAngle() {
 
 
@@ -211,6 +288,7 @@ public class FullHandControl extends AppCompatActivity {
         }
 
     }
+
 
     private void Disconnect()
     {
@@ -267,17 +345,21 @@ public class FullHandControl extends AppCompatActivity {
                     //json.put("username", "test");
                     //json.put("password","prueba1234");
                     //String httpPost = command;
-                    json.put("fecha", "2017-11-28");
+                    //System.out.println(System.currentTimeMillis());
+
+                    String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+                    json.put("fecha", date /*"2017-11-28"*/);
                     json.put("pulgar", 0);
                     json.put("indice", 0 );
                     json.put("medio", 0);
                     json.put("anular", 0);
                     json.put("menique", 0);
-                    json.put("total", seekProgress.getProgress() );
-                    json.put("username", "carlos" );
-                    json.put("paciente", "Antonio Gonzalez" );
+                    json.put("total", seekBarMax /*seekProgress.getProgress()*/ );
+                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/ );
+                    json.put("paciente", UserProfile.getPatientsName() /*"Antonio Gonzalez"*/ );
                     json.put("token", Token.replace("\"",""));
-                    //json.put("etapa", "");
+                    json.put("etapa", UserProfile.getPatientStage());
                     //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
@@ -413,6 +495,7 @@ public class FullHandControl extends AppCompatActivity {
     }
 
 
+    /* Deprecated Code */
     // No longer being used
     private class ConnectBTFullHand extends AsyncTask<Void, Void, Void>  // UI thread
     {
@@ -464,4 +547,44 @@ public class FullHandControl extends AppCompatActivity {
             //progress.dismiss();
         }
     }
+
+
+
+/*
+    private void setTestMode(){
+        Switch switch1;
+        final TextView runTestText;
+
+        runTestText = (TextView) findViewById(R.id.textView11);
+        switch1 = (Switch) findViewById(R.id.switch1);
+
+        if(switch1.isChecked())
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (!isFinishing()){
+                        new AlertDialog.Builder(FullHandControl.this)
+                                .setTitle("Test Mode")
+                                .setMessage("You will now start a test")
+                                .setCancelable(false)
+                                .setPositiveButton("start test", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        seekBar.setProgress(0);
+                                        updateAngle();
+                                        runTestText.setVisibility(int visible);
+
+                                    }
+                                }).show();
+
+                    }
+                }
+            });
+            GetToken();
+        else
+
+    }
+
+*/
 }

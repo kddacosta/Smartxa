@@ -26,6 +26,7 @@ android {
 repositories {
     maven {
         url "https://jitpack.io"
+        jcenter()
     }
 }
 
@@ -34,12 +35,24 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    //compile 'com.github.Triggertrap:SeekArc:v1.1'
+    compile project(':SeekArc_library')
+    compile project(':SeekCircleLibrary')
+
+
+
+
+
+
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.+'
     compile 'com.android.support:support-vector-drawable:26.+'
+    compile 'com.jjoe64:graphview:4.2.1'
+    compile 'com.github.imangazalievm:circlemenu:1.1.1'
+    compile 'com.getkeepsafe.taptargetview:taptargetview:1.10.0'
+    compile 'com.ogaclejapan.arclayout:library:1.1.0@aar'
+    compile 'com.github.apl-devs:appintro:v4.2.2'
+    compile 'com.github.rubengees:introduction:1.4.1'
     testCompile 'junit:junit:4.12'
-    //compile 'com.github.Triggertrap:SeekArc:v1.1'
-    compile project(':SeekArc_library')
-    compile project(':SeekCircleLibrary')
 }

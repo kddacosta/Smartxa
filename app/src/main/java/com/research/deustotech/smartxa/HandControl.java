@@ -25,11 +25,28 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 public class HandControl extends AppCompatActivity {
+
+
+    // TODO: Add back and forward buttons to activities
+    // TODO: Add User settings
+    // TODO: API is not responding to the get request
+    // TODO: A trial == open and close hand one time
+    // Reset how the trials are tracked. Send how many trials were run, and the max value
+    // Interval for how many repitions: 10% threshold
+    // TODO: Add labels, images, and icons
+    // TODO: Add repetition for the test
+    // TODO: Add settings to the test mode
+    // Repetitions: 5 10 15 20
+    // Max angle: 25  30 40 50 75
+    // how long to hold position
+
 
 
     static BluetoothSocket btSocket = null;
@@ -50,6 +67,7 @@ public class HandControl extends AppCompatActivity {
 
     BlueTooth _bluetooth_ctrl;
 
+    public int seekBarMax_f1, seekBarMax_f2, seekBarMax_f3, seekBarMax_f4, seekBarMax_f5 = 0;
 
 
     @Override
@@ -73,11 +91,11 @@ public class HandControl extends AppCompatActivity {
         }
         catch (Exception e)
         {
-
+            System.out.println("Failed to add motors to json array.");
         }
 
         //new ConnectBTFinger().execute();
-        _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
+
 
         f1 = (ImageButton) findViewById(R.id.finger1);
         f2 = (ImageButton) findViewById(R.id.finger2);
@@ -91,6 +109,7 @@ public class HandControl extends AppCompatActivity {
         f4.setImageAlpha(0);
         f5.setImageAlpha(0);
 
+        _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
 
         seekbar();
     }
@@ -114,6 +133,35 @@ public class HandControl extends AppCompatActivity {
                         //visibility.setAlpha(200 - 2*progress_value);
 
                         updateAngle();
+
+
+                        try {
+                            if (jsonMotors.get("motor1").toString() == "1" && progress_value >= seekBarMax_f1) {
+                                System.out.println("array has motor1 " + seekBarMax_f1);
+                                seekBarMax_f1 = progress_value;
+                            }
+                            if (jsonMotors.get("motor2").toString() == "1" && progress_value >= seekBarMax_f2) {
+                                System.out.println("array has motor2 " + seekBarMax_f2);
+                                seekBarMax_f2 = progress_value;
+                            }
+                            if (jsonMotors.get("motor3").toString() == "1" && progress_value >= seekBarMax_f3) {
+                                System.out.println("array has motor3 " + seekBarMax_f3);
+                                seekBarMax_f3 = progress_value;
+                            }
+                            if (jsonMotors.get("motor4").toString() == "1" && progress_value >= seekBarMax_f4) {
+                                System.out.println("array has motor4 " + seekBarMax_f4);
+                                seekBarMax_f4 = progress_value;
+                            }
+                            if (jsonMotors.get("motor5").toString() == "1" && progress_value >= seekBarMax_f5) {
+                                System.out.println("array has motor5 " + seekBarMax_f5);
+                                seekBarMax_f5 = progress_value;
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -136,6 +184,7 @@ public class HandControl extends AppCompatActivity {
             f1.setImageAlpha(255);
             //motorsList.add(1);
             try {
+                System.out.println("Add motor1");
                 jsonMotors.remove("motor1");
                 jsonMotors.put("motor1", 1);
             } catch (Exception e) {
@@ -145,6 +194,7 @@ public class HandControl extends AppCompatActivity {
             f1.setImageAlpha(0);
             //motorsList.remove(1);
             try {
+                System.out.println("Remove motor1");
                 jsonMotors.remove("motor1");
                 jsonMotors.put("motor1", 0);
                 seek_bar.setProgress(0);
@@ -256,6 +306,8 @@ public class HandControl extends AppCompatActivity {
         super.onPause();
         //Disconnect();
 
+        // Send data to the website when user leaves the page
+        GetToken();
     }
 
 
@@ -273,21 +325,14 @@ public class HandControl extends AppCompatActivity {
 
     private void updateAngle() {
 
-        /*
-        String motors = "";
-        for ( Object m : motorsList)
-        {
-             motors = motors.concat(m + ",");
-        }
-        */
-        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
-        //TextView textProgress = (TextView) findViewById(R.id.textView4);
 
-        if (/*textProgress != null && */seekBar != null) {
+        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
+
+        if (seekBar != null) {
             try
             {
-            int progress = seekBar.getProgress();
-            //textProgress.setText(Integer.toString(Integer.toString((int)(((float)progress/180.0)*100))) + "\u00b0");
+                int progress = seekBar.getProgress();
+                //textProgress.setText(Integer.toString(Integer.toString((int)(((float)progress/180.0)*100))) + "\u00b0");
                 try {
                     jsonMotors.remove("angle");
                     jsonMotors.put("angle", progress);
@@ -298,7 +343,7 @@ public class HandControl extends AppCompatActivity {
                 _bluetooth_ctrl.btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
                 //btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
             }
-           catch (java.io.IOException e)
+           catch (/*java.io.IOException*/ Exception e)
             {
                 //Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             }
@@ -414,19 +459,25 @@ public class HandControl extends AppCompatActivity {
                     //json.put("username", "test");
                     //json.put("password","prueba1234");
                     //String httpPost = command;
-                    json.put("fecha", "2017-11-02");
 
+                    // Data format for the API
+                    // now includes 'etapa'
+                    // {"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
 
-                    json.put("pulgar", seekProgress.getProgress() );
-                    json.put("indice", seekProgress.getProgress()  );
-                    json.put("medio", seekProgress.getProgress() );
-                    json.put("anular", seekProgress.getProgress() );
-                    json.put("menique",seekProgress.getProgress() );
+                    String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+                    json.put("fecha", date /*"2017-11-02"*/);
+                    json.put("pulgar", seekBarMax_f1 );
+                    json.put("indice", seekBarMax_f2  );
+                    json.put("medio", seekBarMax_f3 );
+                    json.put("anular", seekBarMax_f4 );
+                    json.put("menique", seekBarMax_f5 );
                     json.put("total", 0);
-                    json.put("username", "carlos" );
-                    json.put("paciente", "Antonio Gonzalez" );
-                    json.put("token", Token);
-                    //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
+                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/ );
+                    json.put("paciente", UserProfile.getPatientsName() /*"Antonio Gonzalez"*/);
+                    json.put("token", Token.replace("\"",""));
+                    json.put("etapa", UserProfile.getPatientStage());
+
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
                     writer.write(json.toString());
@@ -443,7 +494,7 @@ public class HandControl extends AppCompatActivity {
 
 
                         System.out.println("Successfully sent data");
-                        /*
+
                         String line;
                         in = con.getInputStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -458,9 +509,9 @@ public class HandControl extends AppCompatActivity {
                         // Code not necessary for this example
                         //tv.setText(reply);
                         System.out.println("\nresponse content " + reply);
-                        Token = reply;
+                        //Token = reply;
                         //startActivity(new Intent(LoginScreen.this, Home.class));
-                        */
+
                     } else {
                         //Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
                         //tv.setText("Failed to connect: " + respCode);
@@ -500,8 +551,8 @@ public class HandControl extends AppCompatActivity {
 
                     JSONObject json = new JSONObject();
                     //System.out.println("test " + _username.toString());
-                    json.put("username", "carlos");
-                    json.put("password","numero1234");
+                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/);
+                    json.put("password", UserProfile.getUserPassword() /*"numero1234"*/);
                     //String httpPost = command;
 
                     out = con.getOutputStream();
@@ -532,7 +583,7 @@ public class HandControl extends AppCompatActivity {
                         // Code not necessary for this example
                         //tv.setText(reply);
                         System.out.println("\nresponse content " + reply);
-                        Token = reply;
+                        Token = reply.toString();
 
                         sendData();
                         //startActivity(new Intent(LoginScreen.this, Home.class));
