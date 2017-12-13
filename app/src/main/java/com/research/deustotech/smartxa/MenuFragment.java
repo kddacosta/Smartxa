@@ -305,7 +305,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
 
                     JSONObject json = new JSONObject();
                     //System.out.println("test " + _username.toString());
-                    json.put("username", /*UserProfile.getDoctorsName()*/ "carlos");
+                    json.put("username", /*MenuFragment.getDoctorsName()*/ "carlos");
                     json.put("password", /*UserProfile.getUserPassword()*/ "numero1234");
                     //String httpPost = command;
 

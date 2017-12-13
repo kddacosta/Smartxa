@@ -233,8 +233,8 @@ public class LoginScreen extends AppCompatActivity {
                         password = editText.getText().toString();
                         MenuFragment.setUserPassword(password);
 
-                        //startActivity(new Intent(LoginScreen.this, UserProfile.class));
-                        sendCommand(username, password);
+                        startActivity(new Intent(LoginScreen.this, UserProfile.class));
+                        //sendCommand(username, password);
                     }
                 })
                 .setNegativeButton("Cancel",

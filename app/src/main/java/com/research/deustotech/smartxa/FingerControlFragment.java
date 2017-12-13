@@ -311,6 +311,8 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
         }
     }
 
+
+
     public void seekbar(/*final TextView visibility*/){
         //seek_bar = (SeekBar)findViewById(R.id.seekBar);
         //Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);

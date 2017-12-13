@@ -301,6 +301,7 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
 
         rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             int progress_value;
+            int comprobacion = 0;
 
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
@@ -329,12 +330,16 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
                     //GetToken();
 
                 }
+                if (rightPinIndex>5){
+                    comprobacion = 1;
+                }
 
                 // Update the rep count
-                if (rangBarMax > 5 && rightPinIndex == 0)
+                if (rangBarMax > 5 && rightPinIndex < 5 && comprobacion == 1)
                 {
                     repCounter++;
                     repProgress.setText(Integer.toString(repCounter));
+                    comprobacion = 0;
 
 
                 }
