@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.research.deustotech.smartxa">
 
@@ -30,7 +31,7 @@
         <activity android:name=".UserProfile" />
         <activity android:name=".Settings" />
         <activity android:name=".AppIntro" />
-
+        <activity android:name=".MenuFragment"></activity>
     </application>
 
 </manifest>

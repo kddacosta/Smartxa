@@ -1,33 +1,27 @@
 package com.research.deustotech.smartxa;
 
+
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
-import org.json.*;
 
-import com.seekcircle.SeekCircle;
+import com.appyvet.materialrangebar.RangeBar;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -36,26 +30,22 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
-public class HandControl extends AppCompatActivity {
+
+public class FingerControlFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 
 
-    // TODO: Add back and forward buttons to activities
-    // TODO: Add User settings
-    // TODO: API is not responding to the get request -- finished: was calling wrong function
-    // TODO: A trial == open and close hand one time
-    // Reset how the trials are tracked. Send how many trials were run, and the max value
-    // Interval for how many repitions: 10% threshold
-    // TODO: Add labels, images, and icons
-    // TODO: Add repetition for the test
-    // TODO: Add settings to the test mode
-    // Repetitions: 5 10 15 20
-    // Max angle: 25  30 40 50 75
-    // how long to hold position
-    // TODO: update requests to send percentage to the website instead of angle -- finished
+    private static final String ARG_TEXT = "arg_text";
+    private static final String ARG_COLOR = "arg_color";
+
+    private String mText;
+    private int mColor;
+
+    private View mContent;
+    private TextView mTextView;
+
+    View view;
 
 
 
@@ -73,26 +63,88 @@ public class HandControl extends AppCompatActivity {
     ImageButton f1, f2, f3, f4, f5;
     TextView a, b, c, d, e, Seekbar_Text;
     SeekBar seek_bar;
+    RangeBar rangeBar;
     String Token;
 
+    SharedPreferences sp;
     BlueTooth _bluetooth_ctrl;
 
     public int seekBarMax_f1, seekBarMax_f2, seekBarMax_f3, seekBarMax_f4, seekBarMax_f5 = 0;
 
-/*
-    private static final String SELECTED_ITEM = "arg_selected_item";
-    private BottomNavigationView mBottomNav;
-    private int mSelectedItem;
-*/
+
+
+    public static android.support.v4.app.Fragment newInstance(String text, int color) {
+        android.support.v4.app.Fragment frag = new FingerControlFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_TEXT, text);
+        args.putInt(ARG_COLOR, color);
+        frag.setArguments(args);
+        return frag;
+    }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hand_control);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.fragment_finger_control, container, false);
 
-        seek_bar = (SeekBar)findViewById(R.id.seekBar);
-        Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
+
+        f1 = (ImageButton) view.findViewById(R.id.finger1);
+        f2 = (ImageButton) view.findViewById(R.id.finger2);
+        f3 = (ImageButton) view.findViewById(R.id.finger3);
+        f4 = (ImageButton) view.findViewById(R.id.finger4);
+        f5 = (ImageButton) view.findViewById(R.id.finger5);
+
+        f1.setImageAlpha(0);
+        f2.setImageAlpha(0);
+        f3.setImageAlpha(0);
+        f4.setImageAlpha(0);
+        f5.setImageAlpha(0);
+
+        f1.setOnClickListener(this);
+        f2.setOnClickListener(this);
+        f3.setOnClickListener(this);
+        f4.setOnClickListener(this);
+        f5.setOnClickListener(this);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // retrieve text and color from bundle or savedInstanceState
+        if (savedInstanceState == null) {
+            Bundle args = getArguments();
+            mText = args.getString(ARG_TEXT);
+            mColor = args.getInt(ARG_COLOR);
+        } else {
+            mText = savedInstanceState.getString(ARG_TEXT);
+            mColor = savedInstanceState.getInt(ARG_COLOR);
+        }
+
+        // initialize views
+        mContent = view.findViewById(R.id.fragment_content);
+        mTextView = (TextView) view.findViewById(R.id.text);
+
+        // set text and background color
+        mTextView.setText(mText);
+        mContent.setBackgroundColor(mColor);
+
+        sp = this.getActivity().getSharedPreferences( "Smartxa_Preferences", Context.MODE_PRIVATE);
+
+
+        seek_bar = (SeekBar)view.findViewById(R.id.seekBar);
+        rangeBar = (RangeBar)view.findViewById(R.id.rangebar);
+        Seekbar_Text = (TextView)view.findViewById(R.id.SeekbarText);
+
+        rangeBar.setTickEnd(sp.getInt("max_range", 100));
+
+        // Start the range bar at 0
+        rangeBar.setRangePinsByIndices(0,0);
+
 
         try
         {
@@ -112,123 +164,206 @@ public class HandControl extends AppCompatActivity {
 
         //new ConnectBTFinger().execute();
 
-
-        f1 = (ImageButton) findViewById(R.id.finger1);
-        f2 = (ImageButton) findViewById(R.id.finger2);
-        f3 = (ImageButton) findViewById(R.id.finger3);
-        f4 = (ImageButton) findViewById(R.id.finger4);
-        f5 = (ImageButton) findViewById(R.id.finger5);
+/*
+        f1 = (ImageButton) view.findViewById(R.id.finger1);
+        f2 = (ImageButton) view.findViewById(R.id.finger2);
+        f3 = (ImageButton) view.findViewById(R.id.finger3);
+        f4 = (ImageButton) view.findViewById(R.id.finger4);
+        f5 = (ImageButton) view.findViewById(R.id.finger5);
 
         f1.setImageAlpha(0);
         f2.setImageAlpha(0);
         f3.setImageAlpha(0);
         f4.setImageAlpha(0);
         f5.setImageAlpha(0);
+*/
+
 
         _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
 
 
-/*
-        mBottomNav = (BottomNavigationView) findViewById(R.id.navigation);
-        mBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                selectActivity(item);
-                return true;
-            }
-        });
 
-        MenuItem selectedItem;
-        if (savedInstanceState != null) {
-            mSelectedItem = savedInstanceState.getInt(SELECTED_ITEM, 0);
-            selectedItem = mBottomNav.getMenu().findItem(mSelectedItem);
-        } else {
-            selectedItem = mBottomNav.getMenu().getItem(0);
-        }
-        selectActivity(selectedItem);
-
-*/
         seekbar();
+
     }
 
 
-/*
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(SELECTED_ITEM, mSelectedItem);
-        super.onSaveInstanceState(outState);
-    }
+
 
     @Override
-    public void onBackPressed() {
-        MenuItem homeItem = mBottomNav.getMenu().getItem(0);
-        if (mSelectedItem != homeItem.getItemId()) {
-            // select home item
-            selectActivity(homeItem);
-        } else {
-            super.onBackPressed();
+    public void onClick(View v) {
+
+        System.out.println("Button clicked");
+        //do what you want to do when button is clicked
+        switch (v.getId()) {
+            case R.id.finger1:
+                if(f1.getImageAlpha() == 0){
+                    f1.setImageAlpha(255);
+                    //motorsList.add(1);
+                    try {
+                        System.out.println("Add motor1");
+                        jsonMotors.remove("motor1");
+                        jsonMotors.put("motor1", 1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    f1.setImageAlpha(0);
+                    //motorsList.remove(1);
+                    try {
+                        System.out.println("Remove motor1");
+                        jsonMotors.remove("motor1");
+                        jsonMotors.put("motor1", 0);
+                        seek_bar.setProgress(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.finger2:
+                if(f2.getImageAlpha() == 0){
+                    f2.setImageAlpha(255);
+                    //motorsList.add(2);
+                    try {
+                        jsonMotors.remove("motor2");
+                        jsonMotors.put("motor2", 1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    f2.setImageAlpha(0);
+                    //motorsList.remove(2);
+                    try {
+                        jsonMotors.remove("motor2");
+                        jsonMotors.put("motor2", 0);
+                        seek_bar.setProgress(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.finger3:
+                if(f3.getImageAlpha() == 0){
+                    f3.setImageAlpha(255);
+                    //motorsList.add(3);
+                    try {
+                        jsonMotors.remove("motor3");
+                        jsonMotors.put("motor3", 1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    f3.setImageAlpha(0);
+                    //motorsList.remove(3);
+                    try {
+                        jsonMotors.remove("motor3");
+                        jsonMotors.put("motor3", 0);
+                        seek_bar.setProgress(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.finger4:
+                if(f4.getImageAlpha() == 0){
+                    f4.setImageAlpha(255);
+                    //motorsList.add(4);
+                    try {
+                        jsonMotors.remove("motor4");
+                        jsonMotors.put("motor4", 1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    f4.setImageAlpha(0);
+                    //motorsList.remove(4);
+                    try {
+                        jsonMotors.remove("motor4");
+                        jsonMotors.put("motor4", 0);
+                        seek_bar.setProgress(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.finger5:
+                if(f5.getImageAlpha() == 0){
+                    f5.setImageAlpha(255);
+                    //motorsList.add(5);
+                    try {
+                        jsonMotors.remove("motor5");
+                        jsonMotors.put("motor5", 1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    f5.setImageAlpha(0);
+                    //motorsList.remove(5);
+                    try {
+                        jsonMotors.remove("motor5");
+                        jsonMotors.put("motor5", 0);
+                        seek_bar.setProgress(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
         }
     }
-
-    private void selectActivity(MenuItem item) {
-        Fragment frag = null;
-        // init corresponding fragment
-        switch (item.getItemId()) {
-            case R.id.menu_home:
-
-                //frag = MenuFragment.newInstance(getString(R.string.title_home), getColorFromRes(R.color.colorPrimary));
-                break;
-            case R.id.menu_settings:
-                startActivity(new Intent(HandControl.this, Settings.class));
-                //frag = MenuFragment.newInstance(getString(R.string.menu_settings), getColorFromRes(R.color.green));
-                break;
-            case R.id.menu_finger_control:
-                startActivity(new Intent(HandControl.this, HandControl.class));
-                // frag = MenuFragment.newInstance(getString(R.string.menu_finger_control), getColorFromRes(R.color.indigo));
-                break;
-            case R.id.menu_hand_control:
-                startActivity(new Intent(HandControl.this, FullHandControl.class));
-                //frag = MenuFragment.newInstance(getString(R.string.menu_hand_control), getColorFromRes(R.color.red));
-                break;
-        }
-
-        // update selected item
-        mSelectedItem = item.getItemId();
-
-        // uncheck the other items.
-        for (int i = 0; i< mBottomNav.getMenu().size(); i++) {
-            MenuItem menuItem = mBottomNav.getMenu().getItem(i);
-            menuItem.setChecked(menuItem.getItemId() == item.getItemId());
-        }
-
-        updateToolbarText(item.getTitle());
-
-        if (frag != null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.container, frag, frag.getTag());
-            ft.commit();
-        }
-    }
-
-    private void updateToolbarText(CharSequence text) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(text);
-        }
-    }
-
-    private int getColorFromRes(@ColorRes int resId) {
-        return ContextCompat.getColor(this, resId);
-    }
-
-*/
 
     public void seekbar(/*final TextView visibility*/){
         //seek_bar = (SeekBar)findViewById(R.id.seekBar);
         //Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
-        Seekbar_Text.setText("0" + "/" + "100");
+        Seekbar_Text.setText("0" + "/" + (int)(((double)rangeBar.getTickEnd() / 100) * 100));
         int progress_value;
 
+
+        rangeBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            int progress_value;
+
+            @Override
+            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
+
+                progress_value = rightPinIndex;
+                Seekbar_Text.setText(Integer.toString(rightPinIndex) + "/" + (int)(((double)rangeBar.getTickEnd() / 100) * 100));
+                updateAngle();
+
+
+                try {
+                    if (jsonMotors.get("motor1").toString() == "1" && progress_value >= seekBarMax_f1) {
+                        System.out.println("array has motor1 " + seekBarMax_f1);
+                        seekBarMax_f1 = progress_value;
+                    }
+                    if (jsonMotors.get("motor2").toString() == "1" && progress_value >= seekBarMax_f2) {
+                        System.out.println("array has motor2 " + seekBarMax_f2);
+                        seekBarMax_f2 = progress_value;
+                    }
+                    if (jsonMotors.get("motor3").toString() == "1" && progress_value >= seekBarMax_f3) {
+                        System.out.println("array has motor3 " + seekBarMax_f3);
+                        seekBarMax_f3 = progress_value;
+                    }
+                    if (jsonMotors.get("motor4").toString() == "1" && progress_value >= seekBarMax_f4) {
+                        System.out.println("array has motor4 " + seekBarMax_f4);
+                        seekBarMax_f4 = progress_value;
+                    }
+                    if (jsonMotors.get("motor5").toString() == "1" && progress_value >= seekBarMax_f5) {
+                        System.out.println("array has motor5 " + seekBarMax_f5);
+                        seekBarMax_f5 = progress_value;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+        });
+
+
+/*
         seek_bar.setOnSeekBarChangeListener(
 
                 new SeekBar.OnSeekBarChangeListener() {
@@ -284,8 +419,14 @@ public class HandControl extends AppCompatActivity {
                 }
         );
 
+*/
+
     }
 
+
+
+
+/*
     public void f1Clicked(View V)
     {
         if(f1.getImageAlpha() == 0){
@@ -408,39 +549,20 @@ public class HandControl extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-        //Disconnect();
-
-        // Send data to the website when user leaves the page
-        GetToken();
-    }
-
-
-
-    public void setTextBox(TextView finger)
-    {
-        if(finger.getVisibility() == View.INVISIBLE) {
-            finger.setVisibility(View.VISIBLE);
-
-        } else if (finger.getVisibility() == View.VISIBLE){
-            finger.setVisibility(View.INVISIBLE);
-        }
-    }
-
+*/
 
     private void updateAngle() {
 
 
-        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
+        //SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBar);
 
-        if (seekBar != null) {
+        if (rangeBar != null) {
             try
             {
-                int progress = seekBar.getProgress();
+                int progress = (int)(((double)rangeBar.getRightIndex() / 100) * 180);
+                System.out.println(progress);
                 //textProgress.setText(Integer.toString(Integer.toString((int)(((float)progress/180.0)*100))) + "\u00b0");
+
                 try {
                     jsonMotors.remove("angle");
                     jsonMotors.put("angle", progress);
@@ -451,7 +573,7 @@ public class HandControl extends AppCompatActivity {
                 _bluetooth_ctrl.btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
                 //btSocket.getOutputStream().write(String.valueOf(jsonMotors.toString()).getBytes());
             }
-           catch (/*java.io.IOException*/ Exception e)
+            catch (/*java.io.IOException*/ Exception e)
             {
                 //Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             }
@@ -461,89 +583,10 @@ public class HandControl extends AppCompatActivity {
     }
 
 
-    private void Disconnect()
-    {
-        if (btSocket!=null) //If the btSocket is busy
-        {
-            try
-            {
-                btSocket.close(); //close connection
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-        finish(); //return to the first layout
-
-    }
-
-    private void msg(String s)
-    {
-        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-    }
-
-
-    // No longer being used
-    private class ConnectBTFinger extends AsyncTask<Void, Void, Void>  // UI thread
-    {
-        /*
-        static BluetoothSocket btSocket = null;
-        private boolean isBtConnected = false;
-        BluetoothAdapter myBluetooth;
-        private boolean ConnectSuccess = true; //if it's here, it's almost connected
-        private String address = MainActivity.smartxaAddress;
-        private ProgressBar progress;
-        */
-
-        private boolean ConnectSuccess = true; //if it's here, it's almost connected
-
-        @Override
-        protected void onPreExecute() {
-            msg("starting connection");
-            //progress.setVisibility(View.VISIBLE); //.show(this, "Connecting...", "Please wait!!!");  //show a progress dialog
-        }
-
-        @Override
-        protected Void doInBackground(Void... devices) //while the progress dialog is shown, the connection is done in background
-        {
-            try {
-                if (btSocket == null || !isBtConnected) {
-                    myBluetooth = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
-                    BluetoothDevice smartxaDevice = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
-                    btSocket = smartxaDevice.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
-                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-                    btSocket.connect();//start connection
-                }
-            } catch (IOException e) {
-                ConnectSuccess = false;//if the try failed, you can check the exception here
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) //after the doInBackground, it checks if everything went fine
-        {
-            super.onPostExecute(result);
-
-            if (!ConnectSuccess) {
-                msg("Connection Failed. Is it a SPP Bluetooth? Try again.");
-                //finish();
-            } else {
-                msg("Connected.");
-                isBtConnected = true;
-            }
-            //progress.dismiss();
-        }
-    }
-
-
-
-
 
     private void sendData() {
 
-        final SeekBar seekProgress = (SeekBar) findViewById(R.id.seekBar);
+        final SeekBar seekProgress = (SeekBar) view.findViewById(R.id.seekBar);
 
         new Thread(new Runnable() {
             public void run() {
@@ -575,16 +618,17 @@ public class HandControl extends AppCompatActivity {
                     String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
                     json.put("fecha", date /*"2017-11-02"*/);
-                    json.put("pulgar", (seekBarMax_f1 / 180) * 100 );
-                    json.put("indice", (seekBarMax_f2 / 180) * 100 );
-                    json.put("medio", (seekBarMax_f3 / 180) * 100 );
-                    json.put("anular", (seekBarMax_f4 / 180) * 100 );
-                    json.put("menique", (seekBarMax_f5 / 180) * 100 );
+                    json.put("pulgar", (seekBarMax_f1 ));
+                    json.put("indice", (seekBarMax_f2 ));
+                    json.put("medio", (seekBarMax_f3 ));
+                    json.put("anular", (seekBarMax_f4 ));
+                    json.put("menique", (seekBarMax_f5 ));
                     json.put("total", 0);
                     json.put("username", UserProfile.getDoctorsName() /*"carlos"*/ );
                     json.put("paciente", UserProfile.getPatientsName() /*"Antonio Gonzalez"*/);
                     json.put("token", Token.replace("\"",""));
                     json.put("etapa", UserProfile.getPatientStage());
+                    json.put("repeticiones",1);
 
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
@@ -711,6 +755,20 @@ public class HandControl extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        GetToken();
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(ARG_TEXT, mText);
+        outState.putInt(ARG_COLOR, mColor);
+        super.onSaveInstanceState(outState);
+    }
 
 
 }

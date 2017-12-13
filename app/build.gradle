@@ -27,6 +27,7 @@ repositories {
     maven {
         url "https://jitpack.io"
         jcenter()
+
     }
 }
 
@@ -39,12 +40,16 @@ dependencies {
     compile project(':SeekArc_library')
     compile project(':SeekCircleLibrary')
 
+    //compile 'com.roughike:bottom-bar:2.3.1'
+    //compile 'com.alirezaafkar:toolbar:1.1.2'
+    compile('com.appyvet:materialrangebar:1.4.1') {
+        exclude module: 'support-compat'
+    }
 
 
 
 
-
-    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:appcompat-v7:26.0.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.+'
     compile 'com.android.support:support-vector-drawable:26.+'
@@ -54,5 +59,7 @@ dependencies {
     compile 'com.ogaclejapan.arclayout:library:1.1.0@aar'
     compile 'com.github.apl-devs:appintro:v4.2.2'
     compile 'com.github.rubengees:introduction:1.4.1'
+    compile 'com.android.support:support-v4:26.+'
+    compile 'com.airbnb.android:lottie:2.1.0'
     testCompile 'junit:junit:4.12'
 }

@@ -1,35 +1,36 @@
 package com.research.deustotech.smartxa;
 
-import android.app.Application;
-import android.app.AuthenticationRequiredException;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.SystemClock;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.widget.SeekBar;
-import android.widget.Spinner;
+import android.support.annotation.FractionRes;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import android.app.Fragment;
+
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+//import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,31 +40,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
-import org.json.*;
-import org.w3c.dom.Text;
+/**
+ * Created by Kori on 12/8/17.
+ */
 
-
-
-import android.os.Bundle;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
-
-
-public class UserProfile extends AppCompatActivity {
+public class MenuFragment extends android.support.v4.app.Fragment {
 
     public static String doctorsName;
     public static String patientsName;
@@ -77,147 +59,87 @@ public class UserProfile extends AppCompatActivity {
     TextView stage;
     String Token;
 
+    View view;
 
 
-    private static final String SELECTED_ITEM = "arg_selected_item";
-    private BottomNavigationView mBottomNav;
-    private int mSelectedItem;
+    private static final String ARG_TEXT = "arg_text";
+    private static final String ARG_COLOR = "arg_color";
 
+    private String mText;
+    private int mColor;
+
+    private View mContent;
+    private TextView mTextView;
+
+    public static android.support.v4.app.Fragment newInstance(String text, int color) {
+        android.support.v4.app.Fragment frag = new MenuFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_TEXT, text);
+        args.putInt(ARG_COLOR, color);
+        frag.setArguments(args);
+        return frag;
+    }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.activity_menu_fragment, container, false);
+        return view;
 
-        /* TODO: uncomment this
 
-        patient = (TextView) findViewById(R.id.patientName);
-        doctor = (TextView) findViewById(R.id.doctorName);
-        stage = (TextView) findViewById(R.id.stageText);
+
+
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // retrieve text and color from bundle or savedInstanceState
+        if (savedInstanceState == null) {
+            Bundle args = getArguments();
+            mText = args.getString(ARG_TEXT);
+            mColor = args.getInt(ARG_COLOR);
+        } else {
+            mText = savedInstanceState.getString(ARG_TEXT);
+            mColor = savedInstanceState.getInt(ARG_COLOR);
+        }
+
+        // initialize views
+        mContent = view.findViewById(R.id.fragment_content);
+        mTextView = (TextView) view.findViewById(R.id.text);
+
+        // set text and background color
+        mTextView.setText(mText);
+        mContent.setBackgroundColor(mColor);
+
+
+        patient = (TextView) view.findViewById(R.id.patientName);
+        doctor = (TextView) view.findViewById(R.id.doctorName);
+        stage = (TextView) view.findViewById(R.id.stageText);
 
         patient.setText(getPatientsName());
         doctor.setText(getDoctorsName());
         stage.setText(getPatientStage());
 
-        */
-
-        setContentView(R.layout.activity_user_profile);
-        //setContentView(R.layout.activity_menu_fragment);
-        //GetToken();
 
 
-       /* LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });*/
+        //TODO: Build graph based off of stored preference values. Update values each time new data is collected
 
-
-
-       //TODO: Build graph based off of stored preference values. Update values each time new data is collected
-
+        GetToken();
         //BuildUserStatsGraph();
-
-        // sendData();
-
-
-        mBottomNav = (BottomNavigationView) findViewById(R.id.navigation);
-        mBottomNav.setSelectedItemId(R.id.menu_home);
-        mBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                selectFragment(item);
-                return true;
-            }
-        });
-
-        MenuItem selectedItem;
-        if (savedInstanceState != null) {
-            mSelectedItem = savedInstanceState.getInt(SELECTED_ITEM, 0);
-            selectedItem = mBottomNav.getMenu().findItem(mSelectedItem);
-        } else {
-            selectedItem = mBottomNav.getMenu().getItem(3);
-        }
-
-        selectFragment(selectedItem);
-
-
     }
 
-
-
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(SELECTED_ITEM, mSelectedItem);
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(ARG_TEXT, mText);
+        outState.putInt(ARG_COLOR, mColor);
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onBackPressed() {
-        MenuItem homeItem = mBottomNav.getMenu().getItem(3);
-        if (mSelectedItem != homeItem.getItemId()) {
-            // select home item
-            selectFragment(homeItem);
-        } else {
-            super.onBackPressed();
-        }
-    }
 
-    private void selectFragment(MenuItem item) {
-        Fragment frag = null;
-        // init corresponding fragment
-        switch (item.getItemId()) {
-            case R.id.menu_home:
-
-                frag = MenuFragment.newInstance(getString(R.string.title_home), getColorFromRes(R.color.white));
-                break;
-            case R.id.menu_hand_control:
-                frag = HandControlFragment.newInstance(getString(R.string.menu_hand_control), getColorFromRes(R.color.white));
-                break;
-            case R.id.menu_finger_control:
-                frag = FingerControlFragment.newInstance(getString(R.string.menu_finger_control), getColorFromRes(R.color.white));
-                break;
-            case R.id.menu_settings:
-                frag = SettingsFragment.newInstance(getString(R.string.menu_settings), getColorFromRes(R.color.white));
-                break;
-        }
-
-        // update selected item
-        mSelectedItem = item.getItemId();
-
-        // uncheck the other items.
-        for (int i = 0; i< mBottomNav.getMenu().size(); i++) {
-            MenuItem menuItem = mBottomNav.getMenu().getItem(i);
-            menuItem.setChecked(menuItem.getItemId() == item.getItemId());
-        }
-
-        updateToolbarText(item.getTitle());
-
-        if (frag != null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, frag, frag.getTag());
-            //ft.add(R.id.container, frag, frag.getTag());
-            ft.commit();
-        }
-    }
-
-    private void updateToolbarText(CharSequence text) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(text);
-        }
-    }
-
-    private int getColorFromRes(@ColorRes int resId) {
-        return ContextCompat.getColor(this, resId);
-    }
-
-
-
-
-    /*  My Code  */
 
     void setUserData(JSONObject userdata)
     {
@@ -239,26 +161,26 @@ public class UserProfile extends AppCompatActivity {
     }
     public static String getPatientStage()
     {
-       switch(patientStage)
-       {
-           case "Relapsing Remitting (RRMS)":
-               return "RRMS";
-               //break;
-           case "Primary Progressive (PPMS)":
-               return "PPMS";
-               //break;
+        switch(patientStage)
+        {
+            case "Relapsing Remitting (RRMS)":
+                return "RRMS";
+            //break;
+            case "Primary Progressive (PPMS)":
+                return "PPMS";
+            //break;
 
-           case "Progressive Relapsing (PRMS)":
-               return "PRMS";
-               //break;
+            case "Progressive Relapsing (PRMS)":
+                return "PRMS";
+            //break;
 
-           case "Secondary Progressive (SPMS)":
-               return "SPMS";
-               //break;
-           case "Default":
-               return "MS";
-               //break;
-       }
+            case "Secondary Progressive (SPMS)":
+                return "SPMS";
+            //break;
+            case "Default":
+                return "MS";
+            //break;
+        }
 
         return patientStage;
     }
@@ -300,8 +222,8 @@ public class UserProfile extends AppCompatActivity {
                     // {"username": "carlos", "password": "numero1234", "paciente": "Antonio Gonzalez", "inicio": 0, "fin": 719964000}
                     //String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-                    json.put("username", /*doctorsName */ "carlos" );
-                    json.put("paciente", /*patientsName*/ "Antonio Gonzalez");
+                    json.put("username", doctorsName /*"carlos"*/ );
+                    json.put("paciente", patientsName /*"Antonio Gonzalez"*/);
                     json.put("token", Token.replace("\"",""));
                     json.put("password", /*userPassword*/ "numero1234");
                     json.put("inicio", 0);
@@ -442,17 +364,17 @@ public class UserProfile extends AppCompatActivity {
         try
         {
             //Date date = Date.from(Instant.now()); //new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(Calendar.getInstance().getTime());
-            GraphView graph = (GraphView) findViewById(R.id.graph);
+            GraphView graph = (GraphView) view.findViewById(R.id.graph);
             BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[]
                     {
 
                             // {"anular": 19.533333333333335, "menique": 15.983333333333333, "medio": 18.4, "pulgar": 23.183333333333334, "indice": 20.85, "total": 61.61666666666667}
-                            new DataPoint(1.0, 30.0 /*Double.parseDouble(UserData.getString("anular"))*/),
-                            new DataPoint(2.0, 45.5 /*Double.parseDouble(UserData.getString("menique"))*/),
-                            new DataPoint(3.0, 10.0 /*Double.parseDouble(UserData.getString("medio"))*/),
-                            new DataPoint(4.0, 57.4 /*Double.parseDouble(UserData.getString("pulgar"))*/),
-                            new DataPoint(5.0, 80.4 /*Double.parseDouble(UserData.getString("indice"))*/),
-                            new DataPoint(6.0, 27.4 /*Double.parseDouble(UserData.getString("total"))*/),
+                            new DataPoint(1.0, Double.parseDouble(UserData.getString("anular"))),
+                            new DataPoint(2.0, Double.parseDouble(UserData.getString("menique"))),
+                            new DataPoint(3.0, Double.parseDouble(UserData.getString("medio"))),
+                            new DataPoint(4.0, Double.parseDouble(UserData.getString("pulgar"))),
+                            new DataPoint(5.0, Double.parseDouble(UserData.getString("indice"))),
+                            new DataPoint(6.0, Double.parseDouble(UserData.getString("total"))),
                             // new DataPoint(0.0, 10.0),
                             // new DataPoint(1.0, 5.0)
 
@@ -471,12 +393,13 @@ public class UserProfile extends AppCompatActivity {
                 }
             });
 
-            series.setTitle("My Past Week");
+
+            series.setTitle("My Past Week ( Ave. %)");
 
             series.setOnDataPointTapListener(new OnDataPointTapListener() {
                 @Override
                 public void onTap(Series series, DataPointInterface dataPoint) {
-                    Toast.makeText(getApplicationContext(),"stuff", Toast.LENGTH_SHORT);
+                   // Toast.makeText(getApplicationContext(),"stuff", Toast.LENGTH_SHORT);
                 }
             });
 
@@ -502,9 +425,12 @@ public class UserProfile extends AppCompatActivity {
 
             // use static labels for horizontal and vertical labels
             StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-            staticLabelsFormatter.setHorizontalLabels(new String[] {"anular", "men.", "medio", "pulgar", "indice", "total"});
+            staticLabelsFormatter.setHorizontalLabels(new String[] {"Anular", "Men.", "Medio", "Pulgar", "Indice", "Mano"});
             //staticLabelsFormatter.setVerticalLabels(new String[] {"Average (%)"});
             graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+
+            graph.getLegendRenderer().setVisible(true);
+            graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
 
         }
         catch (Exception e)
@@ -514,82 +440,4 @@ public class UserProfile extends AppCompatActivity {
     }
 
 
-    // TODO: Deprecate and remove the Async Task methods
-
-    private class RequestTokenTask extends AsyncTask<String, Integer, String> {
-        protected String doInBackground(String... urls) {
-           try {
-               URL url = new URL("http://10.32.8.79/sesion/api/login");
-               HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-               connection.setRequestMethod("POST");
-               //connection.addRequestProperty("username",username);
-               //connection.addRequestProperty("password",password);
-               connection.setDoOutput(true);
-               connection.setConnectTimeout(5000);
-               connection.setReadTimeout(5000);
-               connection.connect();
-               BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-               String content = "", line;
-               while ((line = rd.readLine()) != null) {
-                   content += line + "\n";
-               }
-               Toast.makeText(getApplicationContext(),content,Toast.LENGTH_LONG).show();
-               return content;
-           }
-           catch (Exception e)
-           {
-
-           }
-           return null;
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-        }
-
-        protected void onPostExecute(String result) {
-            // this is executed on the main thread after the process is over
-            // update your UI here
-            //displayMessage(result);
-            //Toast.makeText(getApplicationContext(),,Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-    private class PostUserDataTask extends AsyncTask<String, Integer, String> {
-        protected String doInBackground(String... urls) {
-            try {
-                URL url = new URL("http://10.32.8.79/sesion/api/");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.addRequestProperty("userData",UserData.toString());
-
-                connection.setDoOutput(true);
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.connect();
-                BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String content = "", line;
-                while ((line = rd.readLine()) != null) {
-                    content += line + "\n";
-                }
-                Toast.makeText(getApplicationContext(),content,Toast.LENGTH_LONG).show();
-                return content;
-            }
-            catch (Exception e)
-            {
-
-            }
-            return null;
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-        }
-
-        protected void onPostExecute(String result) {
-            // this is executed on the main thread after the process is over
-            // update your UI here
-            //displayMessage(result);
-            //Toast.makeText(getApplicationContext(),,Toast.LENGTH_LONG).show();
-        }
-    }
 }

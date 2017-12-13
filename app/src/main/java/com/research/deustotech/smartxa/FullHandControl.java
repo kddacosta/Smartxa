@@ -5,8 +5,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.SystemClock;
+import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -65,6 +73,12 @@ public class FullHandControl extends AppCompatActivity {
 
     Switch modeSwitch;
 
+
+    private static final String SELECTED_ITEM = "arg_selected_item";
+    private BottomNavigationView mBottomNav;
+    private int mSelectedItem;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,12 +113,107 @@ public class FullHandControl extends AppCompatActivity {
         seekbar();
         switchBarListener();
 
+
+
+        mBottomNav = (BottomNavigationView) findViewById(R.id.navigation);
+        mBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setChecked(true);
+                selectActivity(item);
+                return true;
+            }
+        });
+
+
+        /*
+        MenuItem selectedItem;
+        if (savedInstanceState != null) {
+            mSelectedItem = savedInstanceState.getInt(SELECTED_ITEM, 0);
+            selectedItem = mBottomNav.getMenu().findItem(mSelectedItem);
+        } else {
+            selectedItem = mBottomNav.getMenu().getItem(0);
+        }
+        selectActivity(selectedItem);
+
+*/
         // Prompt the user to select a control mode
         showModeDialog();
 
 
     }
 
+
+/*
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(SELECTED_ITEM, mSelectedItem);
+        super.onSaveInstanceState(outState);
+    }
+*/
+    @Override
+    public void onBackPressed() {
+        MenuItem homeItem = mBottomNav.getMenu().getItem(0);
+        if (mSelectedItem != homeItem.getItemId()) {
+            // select home item
+            selectActivity(homeItem);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void selectActivity(MenuItem item) {
+        Fragment frag = null;
+        // init corresponding fragment
+        switch (item.getItemId()) {
+            case R.id.menu_home:
+
+                //frag = MenuFragment.newInstance(getString(R.string.title_home), getColorFromRes(R.color.colorPrimary));
+                break;
+            case R.id.menu_settings:
+                startActivity(new Intent(FullHandControl.this, Settings.class));
+                //frag = MenuFragment.newInstance(getString(R.string.menu_settings), getColorFromRes(R.color.green));
+                break;
+            case R.id.menu_finger_control:
+                startActivity(new Intent(FullHandControl.this, HandControl.class));
+                // frag = MenuFragment.newInstance(getString(R.string.menu_finger_control), getColorFromRes(R.color.indigo));
+                break;
+            case R.id.menu_hand_control:
+                startActivity(new Intent(FullHandControl.this, FullHandControl.class));
+                //frag = MenuFragment.newInstance(getString(R.string.menu_hand_control), getColorFromRes(R.color.red));
+                break;
+        }
+
+        // update selected item
+        mSelectedItem = item.getItemId();
+
+        // uncheck the other items.
+        for (int i = 0; i< mBottomNav.getMenu().size(); i++) {
+            MenuItem menuItem = mBottomNav.getMenu().getItem(i);
+            menuItem.setChecked(menuItem.getItemId() == item.getItemId());
+        }
+
+        updateToolbarText(item.getTitle());
+
+        if (frag != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.container, frag, frag.getTag());
+            ft.commit();
+        }
+    }
+
+    private void updateToolbarText(CharSequence text) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(text);
+        }
+    }
+
+    /*
+    private int getColorFromRes(@ColorRes int resId) {
+        return ContextCompat.getColor(this, resId);
+    }
+    */
 
     public void showModeDialog()
     {
@@ -355,11 +464,13 @@ public class FullHandControl extends AppCompatActivity {
                     json.put("medio", 0);
                     json.put("anular", 0);
                     json.put("menique", 0);
-                    json.put("total", seekBarMax /*seekProgress.getProgress()*/ );
-                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/ );
-                    json.put("paciente", UserProfile.getPatientsName() /*"Antonio Gonzalez"*/ );
+                    json.put("total", (int)(((float)seekBarMax/180.0)*100) );
+                    //System.out.println((int)(((float)50/180.0)*100) );
+                    json.put("username", /*UserProfile.getDoctorsName()*/ "carlos" );
+                    json.put("paciente", /*UserProfile.getPatientsName()*/ "Antonio Gonzalez" );
                     json.put("token", Token.replace("\"",""));
-                    json.put("etapa", UserProfile.getPatientStage());
+                    json.put("etapa", /*UserProfile.getPatientStage()*/ "Test");
+                    json.put("repeticiones", 5);
                     //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));

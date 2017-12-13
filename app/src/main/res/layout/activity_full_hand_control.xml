@@ -10,6 +10,8 @@
     >
 
 
+    <!--design:menu="@menu/bottom_nav_items" />-->
+
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
@@ -111,6 +113,52 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
+
+    <com.appyvet.materialrangebar.RangeBar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="335dp"
+        android:layout_height="85dp"
+        app:mrb_pinMaxFont="15sp"
+        app:mrb_rangeBarPaddingBottom="12dp"
+        app:mrb_selectorBoundaryColor="@color/blue"
+        app:mrb_selectorBoundarySize="2dp"
+        app:mrb_pinTextColor="#ACD123"
+        app:mrb_selectorSize="10dp"
+        app:mrb_tickEnd="100"
+        app:mrb_tickInterval="1"
+        app:mrb_tickStart="0"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_bias="0.897"
+        app:layout_constraintHorizontal_bias="0.515"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+
+    <com.appyvet.materialrangebar.RangeBar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/rangebar"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        app:mrb_rangeBar="false"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.2"
+        android:layout_marginStart="8dp" />
+
+
     <!--
     <ToggleButton
         android:id="@+id/modeButton"
@@ -200,7 +248,9 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.017"
-        tools:checked="false" />
+        tools:checked="false"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
 
     <TextView
@@ -221,6 +271,25 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.04" />
+        app:layout_constraintVertical_bias="0.04"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:menu="@menu/bottom_nav_items" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,8 +1,10 @@
 package com.research.deustotech.smartxa;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +45,7 @@ public class LoginScreen extends AppCompatActivity {
     TextView patientName;
     TextView doctorName;
     Spinner stage;
+    SharedPreferences sp;
 
     // Stuff to reference the textview on the custom input_dialog layout
     //LayoutInflater layoutInflater;
@@ -57,6 +60,7 @@ public class LoginScreen extends AppCompatActivity {
 
         loginButton = (Button) findViewById(R.id.authbutton);
 
+        sp = getSharedPreferences( "Smartxa_Preferences", Context.MODE_PRIVATE);
 
         // Create an instance of the async task -- not executed yet
         //request = new RequestTokenTask();
@@ -97,7 +101,7 @@ public class LoginScreen extends AppCompatActivity {
 
     public void loginButtonClicked(View v)
     {
-        // startActivity(new Intent(LoginScreen.this, Home.class));
+         //startActivity(new Intent(LoginScreen.this, UserProfile.class));
 
         // Reference the textviews and spinner by Id
         patientName = (TextView) findViewById(R.id.patientNameText);
@@ -163,9 +167,15 @@ public class LoginScreen extends AppCompatActivity {
 
                 // Store the user entered data in publically accessible vars
 
-                UserProfile.setPatientsName(patientName.getText().toString());
-                UserProfile.setDoctorsName(doctorName.getText().toString());
-                UserProfile.setPatientStage(stage.getSelectedItem().toString());
+                MenuFragment.setPatientsName(patientName.getText().toString());
+                MenuFragment.setDoctorsName(doctorName.getText().toString());
+                MenuFragment.setPatientStage(stage.getSelectedItem().toString());
+
+                // Update the shared preferences
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("patient_name",patientName.getText().toString());
+                editor.putString("doctor_name",doctorName.getText().toString());
+                editor.putString("stage",stage.getSelectedItem().toString());
 
 
             } catch (Exception e) {
@@ -191,10 +201,12 @@ public class LoginScreen extends AppCompatActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginScreen.this);
         alertDialogBuilder.setView(promptView);
 
-        //CheckBox showPass = (CheckBox) findViewById(R.id.showPasswordCheckBox);
+
         final EditText editText = (EditText) promptView.findViewById(R.id.edittext);
 
 /*
+
+        CheckBox showPass = (CheckBox) findViewById(R.id.showPasswordCheckBox);
         showPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
@@ -219,8 +231,9 @@ public class LoginScreen extends AppCompatActivity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         password = editText.getText().toString();
-                        UserProfile.setUserPassword(password);
+                        MenuFragment.setUserPassword(password);
 
+                        //startActivity(new Intent(LoginScreen.this, UserProfile.class));
                         sendCommand(username, password);
                     }
                 })
@@ -234,6 +247,27 @@ public class LoginScreen extends AppCompatActivity {
         // create an alert dialog
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
+
+
+        CheckBox showPass = (CheckBox) alert.findViewById(R.id.showPasswordCheckBox);
+        showPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isChecked()) {
+                    //checked
+                    System.out.println("Checked");
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
+                else
+                {
+                    System.out.println("Unchecked");
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                }
+                //not checked
+            }
+
+        });
     }
 
 
@@ -294,7 +328,7 @@ public class LoginScreen extends AppCompatActivity {
                         if (!reply.toString().contains("Usuario inválido"))
                         {
                             // Open the next window on a successful login
-                            startActivity(new Intent(LoginScreen.this, Home.class));
+                            startActivity(new Intent(LoginScreen.this, UserProfile.class));
                         }
                         else
                         {

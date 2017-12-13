@@ -9,8 +9,11 @@ import android.content.pm.LabeledIntent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.bluetooth.*;
 import android.widget.ArrayAdapter;
@@ -18,6 +21,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.github.paolorotolo.appintro.*;
 import com.rubengees.introduction.IntroductionBuilder;
@@ -46,9 +50,20 @@ public class MainActivity extends AppCompatActivity {
 
     public static Context mainActivityContext;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Toolbar myToolbar = (Toolbar) findViewById(R.id.smartxa_toolbar);
+        //setSupportActionBar(myToolbar);
+        //ActionBar smartxa_bar = getSupportActionBar();
+
+       // myToolbar.setTitle("Smartxa");
+
+        //smartxa_bar.setDisplayHomeAsUpEnabled(true);
+        //smartxa_bar.setHomeButtonEnabled(true);
 
         mainActivityContext = getApplicationContext();
         setContentView(R.layout.activity_main);
@@ -56,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
         //loadBar.setAlpha(0);
         //BlueTooth.Disconnect();
         continueBtn = (Button) findViewById(R.id.continuebutton);
+
+        //System.out.println(System.currentTimeMillis());
+
 
 
 
@@ -71,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
             //new IntroductionBuilder(this);
             //new IntroductionBuilder(this).withSlides(generateSlides());
-            new IntroductionBuilder(this).withSlides(generateSlides()).introduceMyself();
+            //TODO: edit intro slides
+           // new IntroductionBuilder(this).withSlides(generateSlides()).introduceMyself();
 
             //Intent intent = new Intent(this, IntroSlides.class); // Call the AppIntro java class
             //startActivity(intent);
@@ -123,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
     public void continueButtonClicked(View v)
     {
 
+        // System.out.println(System.currentTimeMillis());
 
         //Toast.makeText(MainActivity.this, "Connecting to SmartXa. Please wait...", Toast.LENGTH_SHORT).show();
         //try{ Thread.sleep(3000); }catch(InterruptedException e){ }
@@ -137,8 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         //startActivity(new Intent(MainActivity.this, LoginScreen.class));
 
-        //startActivity(new Intent(MainActivity.this, AppIntro.class));
-        //TODO: This is the main function to execute. uncomment after testing.
+      //TODO: This is the main function to execute. uncomment after testing.
 
         if(bluetooth != null)
         {
