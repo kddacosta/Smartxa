@@ -1,5 +1,7 @@
 package com.research.deustotech.smartxa;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.FractionRes;
@@ -61,6 +63,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
 
     View view;
 
+    SharedPreferences sp;
 
     private static final String ARG_TEXT = "arg_text";
     private static final String ARG_COLOR = "arg_color";
@@ -107,6 +110,8 @@ public class MenuFragment extends android.support.v4.app.Fragment {
             mColor = savedInstanceState.getInt(ARG_COLOR);
         }
 
+        sp = this.getActivity().getSharedPreferences( "Smartxa_Preferences", Context.MODE_PRIVATE);
+
         // initialize views
         mContent = view.findViewById(R.id.fragment_content);
         mTextView = (TextView) view.findViewById(R.id.text);
@@ -120,7 +125,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
         doctor = (TextView) view.findViewById(R.id.doctorName);
         stage = (TextView) view.findViewById(R.id.stageText);
 
-        patient.setText(getPatientsName());
+        patient.setText(sp.getString("patient_name", ""));
         doctor.setText(getDoctorsName());
         stage.setText(getPatientStage());
 
@@ -223,7 +228,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
                     //String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
                     json.put("username", doctorsName /*"carlos"*/ );
-                    json.put("paciente", patientsName /*"Antonio Gonzalez"*/);
+                    json.put("paciente", sp.getString("patient_name", "Antonio Gonzalez")  /*"Antonio Gonzalez"*/);
                     json.put("token", Token.replace("\"",""));
                     json.put("password", /*userPassword*/ "numero1234");
                     json.put("inicio", 0);

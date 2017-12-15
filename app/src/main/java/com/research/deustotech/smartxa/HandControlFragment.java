@@ -441,10 +441,12 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
                     json.put("menique", 0);
                     json.put("total", /*(int)(((float)seekBarMax/180.0)*100)*/ rangBarMax );
                     //System.out.println((int)(((float)50/180.0)*100) );
-                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/ );
-                    json.put("paciente", UserProfile.getPatientsName() /*"Antonio Gonzalez"*/ );
+                    System.out.println(MenuFragment.getDoctorsName());
+                    System.out.println(sp.getString("patient_name","Antonio Gonzalez"));
+                    json.put("username", MenuFragment.getDoctorsName() /*"carlos"*/ );
+                    json.put("paciente", sp.getString("patient_name", "Antonio Gonzalez")  /*"Antonio Gonzalez"*/ );
                     json.put("token", Token.replace("\"",""));
-                    json.put("etapa", UserProfile.getPatientStage() /*"Test"*/);
+                    json.put("etapa", MenuFragment.getPatientStage() /*"Test"*/);
                     json.put("repeticiones", repCounter);
                     //{"fecha":"2017-10-24","pulgar":20,"indice":20,"medio":50,"anular":30,"menique":30,"total":30,"username":"carlos", "paciente":"Antonio Gonzalez", "token":"550a799903bd2931b58cc577586c4fc6af7fce46"}
                     out = con.getOutputStream();

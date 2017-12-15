@@ -177,7 +177,8 @@ public class SettingsFragment extends android.support.v4.app.Fragment implements
             editor.apply();
             editor.commit();
 
-            Toast.makeText(this.getActivity().getApplicationContext(),"Patient changed", Toast.LENGTH_LONG);
+            System.out.println(sp.getString("patient_name", "Name"));
+            //Toast.makeText(this.getActivity().getApplicationContext(),"Patient changed", Toast.LENGTH_LONG);
 
             checkView.playAnimation();
         }

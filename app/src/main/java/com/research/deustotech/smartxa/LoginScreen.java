@@ -176,7 +176,10 @@ public class LoginScreen extends AppCompatActivity {
                 editor.putString("patient_name",patientName.getText().toString());
                 editor.putString("doctor_name",doctorName.getText().toString());
                 editor.putString("stage",stage.getSelectedItem().toString());
+                editor.apply();
+                editor.commit();
 
+                System.out.println(sp.getString("patient_name",""));
 
             } catch (Exception e) {
                 System.out.println("Failed" + e);
@@ -233,8 +236,8 @@ public class LoginScreen extends AppCompatActivity {
                         password = editText.getText().toString();
                         MenuFragment.setUserPassword(password);
 
-                        startActivity(new Intent(LoginScreen.this, UserProfile.class));
-                        //sendCommand(username, password);
+                        //startActivity(new Intent(LoginScreen.this, UserProfile.class));
+                        sendCommand(username, password);
                     }
                 })
                 .setNegativeButton("Cancel",

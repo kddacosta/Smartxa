@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         //BlueTooth smartxaBluetooth = new BlueTooth();
         //smartxaBluetooth.bluetooth = BluetoothAdapter.getDefaultAdapter();
 
-        startActivity(new Intent(MainActivity.this, LoginScreen.class));
+        //startActivity(new Intent(MainActivity.this, LoginScreen.class));
 
       //TODO: This is the main function to execute. uncomment after testing.
 

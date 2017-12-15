@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -136,7 +137,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
         sp = this.getActivity().getSharedPreferences( "Smartxa_Preferences", Context.MODE_PRIVATE);
 
 
-        seek_bar = (SeekBar)view.findViewById(R.id.seekBar);
+        //seek_bar = (SeekBar)view.findViewById(R.id.seekBar);
         rangeBar = (RangeBar)view.findViewById(R.id.rangebar);
         Seekbar_Text = (TextView)view.findViewById(R.id.SeekbarText);
 
@@ -162,6 +163,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
             System.out.println("Failed to add motors to json array.");
         }
 
+        System.out.println(jsonMotors);
         //new ConnectBTFinger().execute();
 
 /*
@@ -204,6 +206,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                         System.out.println("Add motor1");
                         jsonMotors.remove("motor1");
                         jsonMotors.put("motor1", 1);
+                        System.out.println(jsonMotors);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -214,7 +217,8 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                         System.out.println("Remove motor1");
                         jsonMotors.remove("motor1");
                         jsonMotors.put("motor1", 0);
-                        seek_bar.setProgress(0);
+                        System.out.println(jsonMotors);
+                        rangeBar.setRangePinsByIndices(0,0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -225,19 +229,25 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f2.setImageAlpha(255);
                     //motorsList.add(2);
                     try {
+                        System.out.println("Add motor2");
                         jsonMotors.remove("motor2");
                         jsonMotors.put("motor2", 1);
+                        System.out.println(jsonMotors);
                     } catch (Exception e) {
+                        System.out.println("failed to add motor 2");
                         e.printStackTrace();
                     }
                 }else {
                     f2.setImageAlpha(0);
                     //motorsList.remove(2);
                     try {
+                        System.out.println("Remove motor2");
                         jsonMotors.remove("motor2");
                         jsonMotors.put("motor2", 0);
-                        seek_bar.setProgress(0);
+                        System.out.println(jsonMotors);
+                        rangeBar.setRangePinsByIndices(0,0);
                     } catch (Exception e) {
+                        System.out.println("failed to remove motor 2");
                         e.printStackTrace();
                     }
                 }
@@ -247,8 +257,10 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f3.setImageAlpha(255);
                     //motorsList.add(3);
                     try {
+                        System.out.println("Add motor3");
                         jsonMotors.remove("motor3");
                         jsonMotors.put("motor3", 1);
+                        System.out.println(jsonMotors);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -256,9 +268,11 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f3.setImageAlpha(0);
                     //motorsList.remove(3);
                     try {
+                        System.out.println("Remove motor3");
                         jsonMotors.remove("motor3");
                         jsonMotors.put("motor3", 0);
-                        seek_bar.setProgress(0);
+                        System.out.println(jsonMotors);
+                        rangeBar.setRangePinsByIndices(0,0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -269,8 +283,10 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f4.setImageAlpha(255);
                     //motorsList.add(4);
                     try {
+                        System.out.println("Add motor4");
                         jsonMotors.remove("motor4");
                         jsonMotors.put("motor4", 1);
+                        System.out.println(jsonMotors);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -278,9 +294,11 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f4.setImageAlpha(0);
                     //motorsList.remove(4);
                     try {
+                        System.out.println("Remove motor4");
                         jsonMotors.remove("motor4");
                         jsonMotors.put("motor4", 0);
-                        seek_bar.setProgress(0);
+                        System.out.println(jsonMotors);
+                        rangeBar.setRangePinsByIndices(0,0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -291,8 +309,10 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f5.setImageAlpha(255);
                     //motorsList.add(5);
                     try {
+                        System.out.println("Add motor5");
                         jsonMotors.remove("motor5");
                         jsonMotors.put("motor5", 1);
+                        System.out.println(jsonMotors);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -300,9 +320,11 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
                     f5.setImageAlpha(0);
                     //motorsList.remove(5);
                     try {
+                        System.out.println("Remove motor5");
                         jsonMotors.remove("motor5");
                         jsonMotors.put("motor5", 0);
-                        seek_bar.setProgress(0);
+                        System.out.println(jsonMotors);
+                        rangeBar.setRangePinsByIndices(0,0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -332,23 +354,23 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
 
 
                 try {
-                    if (jsonMotors.get("motor1").toString() == "1" && progress_value >= seekBarMax_f1) {
+                    if (jsonMotors.get("motor1").equals(1) && progress_value >= seekBarMax_f1) {
                         System.out.println("array has motor1 " + seekBarMax_f1);
                         seekBarMax_f1 = progress_value;
                     }
-                    if (jsonMotors.get("motor2").toString() == "1" && progress_value >= seekBarMax_f2) {
+                    if (jsonMotors.get("motor2").equals(1) && progress_value >= seekBarMax_f2) {
                         System.out.println("array has motor2 " + seekBarMax_f2);
                         seekBarMax_f2 = progress_value;
                     }
-                    if (jsonMotors.get("motor3").toString() == "1" && progress_value >= seekBarMax_f3) {
+                    if (jsonMotors.get("motor3").equals(1) && progress_value >= seekBarMax_f3) {
                         System.out.println("array has motor3 " + seekBarMax_f3);
                         seekBarMax_f3 = progress_value;
                     }
-                    if (jsonMotors.get("motor4").toString() == "1" && progress_value >= seekBarMax_f4) {
+                    if (jsonMotors.get("motor4").equals(1) && progress_value >= seekBarMax_f4) {
                         System.out.println("array has motor4 " + seekBarMax_f4);
                         seekBarMax_f4 = progress_value;
                     }
-                    if (jsonMotors.get("motor5").toString() == "1" && progress_value >= seekBarMax_f5) {
+                    if (jsonMotors.get("motor5").equals(1) && progress_value >= seekBarMax_f5) {
                         System.out.println("array has motor5 " + seekBarMax_f5);
                         seekBarMax_f5 = progress_value;
                     }
@@ -621,15 +643,22 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
 
                     json.put("fecha", date /*"2017-11-02"*/);
                     json.put("pulgar", (seekBarMax_f1 ));
+                    System.out.println(seekBarMax_f1);
+                    System.out.println(seekBarMax_f2);
+                    System.out.println(seekBarMax_f3);
+                    System.out.println(seekBarMax_f4);
+                    System.out.println(seekBarMax_f5);
                     json.put("indice", (seekBarMax_f2 ));
                     json.put("medio", (seekBarMax_f3 ));
                     json.put("anular", (seekBarMax_f4 ));
                     json.put("menique", (seekBarMax_f5 ));
                     json.put("total", 0);
-                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/ );
-                    json.put("paciente", UserProfile.getPatientsName() /*"Antonio Gonzalez"*/);
+                    json.put("username", MenuFragment.getDoctorsName() /*"carlos"*/ );
+                    System.out.println(MenuFragment.getDoctorsName());
+                    json.put("paciente", sp.getString("patient_name", "Antonio Gonzalez") /*"Antonio Gonzalez"*/);
+                    System.out.println(sp.getString("patient_name", ""));
                     json.put("token", Token.replace("\"",""));
-                    json.put("etapa", UserProfile.getPatientStage());
+                    json.put("etapa", MenuFragment.getPatientStage());
                     json.put("repeticiones",1);
 
                     out = con.getOutputStream();
@@ -705,8 +734,8 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
 
                     JSONObject json = new JSONObject();
                     //System.out.println("test " + _username.toString());
-                    json.put("username", UserProfile.getDoctorsName() /*"carlos"*/);
-                    json.put("password", UserProfile.getUserPassword() /*"numero1234"*/);
+                    json.put("username", MenuFragment.getDoctorsName() /*"carlos"*/);
+                    json.put("password", MenuFragment.getUserPassword() /*"numero1234"*/);
                     //String httpPost = command;
 
                     out = con.getOutputStream();
