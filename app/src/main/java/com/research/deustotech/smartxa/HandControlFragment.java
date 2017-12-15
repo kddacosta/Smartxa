@@ -153,6 +153,7 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
 
         // Start the range bar at 0
         rangeBar.setRangePinsByIndices(0,0);
+        rangeBar.setTickInterval(10);
 
         // Create object references
         seekBar = (SeekBar) view.findViewById(R.id.seekBar2);
@@ -367,8 +368,8 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
             try
             {
                 //int progress = seekBar.getProgress();
-                int progress = (int)(((double)rangeBar.getRightIndex() / 100) * 180);
-                textProgress.setText(Integer.toString(rangeBar.getRightIndex()));
+                int progress = (int)(((double)rangeBar.getRightIndex() / 10) * 180);
+                textProgress.setText(Integer.toString(rangeBar.getRightIndex() * 10));
 
                 try {
                     jsonMotors.remove("angle");
