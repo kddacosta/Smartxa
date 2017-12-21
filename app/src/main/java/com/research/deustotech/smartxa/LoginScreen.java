@@ -225,8 +225,8 @@ public class LoginScreen extends AppCompatActivity {
                         loginButton.setClickable(false);
                         loginButton.setBackgroundColor(getResources().getColor(R.color.introduction_transparent_grey));
 
-                        startActivity(new Intent(LoginScreen.this, UserProfile.class));
-//                        GetToken(username, password);
+//                        startActivity(new Intent(LoginScreen.this, UserProfile.class));
+                        GetToken(username, password);
 
 //                        loginButton.setClickable(true);
 //                        loadView.cancelAnimation();
