@@ -147,6 +147,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
 
         // Start the range bar at 0
         rangeBar.setRangePinsByIndices(0,0);
+        rangeBar.setTickInterval(10);
 
 
         try
@@ -361,7 +362,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
     public void seekbar(/*final TextView visibility*/){
         //seek_bar = (SeekBar)findViewById(R.id.seekBar);
         //Seekbar_Text = (TextView)findViewById(R.id.SeekbarText);
-        Seekbar_Text.setText("0" + "/" + (int)(((double)rangeBar.getTickEnd() / 100) * 100));
+        Seekbar_Text.setText("0/100");
         int progress_value;
 
 
@@ -372,7 +373,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
 
                 progress_value = rightPinIndex;
-                Seekbar_Text.setText(Integer.toString(rightPinIndex) + "/" + (int)(((double)rangeBar.getTickEnd() / 100) * 100));
+                Seekbar_Text.setText(Integer.toString(rightPinIndex * 10) + "/100");
                 updateAngle();
 
 
@@ -606,7 +607,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
         if (rangeBar != null) {
             try
             {
-                int progress = (int)(((double)rangeBar.getRightIndex() / 100) * 180);
+                int progress = (int)(((double)rangeBar.getRightIndex() / 10) * 180);
                 System.out.println(progress);
                 //textProgress.setText(Integer.toString(Integer.toString((int)(((float)progress/180.0)*100))) + "\u00b0");
 
