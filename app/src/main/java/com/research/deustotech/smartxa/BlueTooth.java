@@ -5,8 +5,11 @@ package com.research.deustotech.smartxa;
  */
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +42,7 @@ import java.util.Set;
 
 public class BlueTooth extends Activity {
 
-    String address = MainActivity.smartxaAddress; //= null;
+    String address = null; //= MainActivity.smartxaAddress; //= null;
     //static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     //BluetoothAdapter bluetooth;
@@ -52,8 +55,19 @@ public class BlueTooth extends Activity {
     public Context btoothContext;
 
 
-    public BlueTooth()
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+
+    public BlueTooth(String _address, Context _context)
     {
+        this.address = _address;
+        this.btoothContext = _context;
          //= BluetoothAdapter.getDefaultAdapter();
 
        // new ConnectBT().execute();
@@ -66,7 +80,7 @@ public class BlueTooth extends Activity {
     {
 
 
-        btoothContext = MainActivity.mainActivityContext;
+//        btoothContext = MainActivity.mainActivityContext;
 /*
         Handler mainHandler = new Handler(btoothContext.getMainLooper());
 
@@ -82,8 +96,8 @@ public class BlueTooth extends Activity {
         mainHandler.post(myRunnable);
 
 */
-        Thread t = new Thread() {
-            public void run() {
+//        Thread t = new Thread() {
+//            public void run() {
 
                 System.out.println("Starting new bluetooth thread");
 
@@ -101,7 +115,7 @@ public class BlueTooth extends Activity {
                         BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                         btSocket.connect();//start connection
                         isBtConnected = true;
-                        System.out.println("Made it through the bluetooth setup" + isBtConnected);
+                        System.out.println("Made it through the bluetooth setup " + isBtConnected);
                     }
                     else
                     {
@@ -116,12 +130,16 @@ public class BlueTooth extends Activity {
                 }
                 System.out.println("End of the thread process.");
 
+
+                // troubleshoot
+                //isBtConnected = true;
+
             }
-        };
+//        };
 
-        t.start();
+//        t.start();
 
-        MainActivity.continueBtn.setClickable(true);
+        //MainActivity.continueBtn.setClickable(true);
 
         /*
         try
@@ -135,7 +153,7 @@ public class BlueTooth extends Activity {
         }
         */
 
-    }
+//    }
 
     public static void Disconnect()
     {

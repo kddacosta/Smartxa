@@ -2,6 +2,7 @@ package com.research.deustotech.smartxa;
 
 import android.app.Application;
 import android.app.AuthenticationRequiredException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -77,7 +78,7 @@ public class UserProfile extends AppCompatActivity {
     TextView stage;
     String Token;
 
-
+    public static Context userProfileContext;
 
     private static final String SELECTED_ITEM = "arg_selected_item";
     private BottomNavigationView mBottomNav;
@@ -100,6 +101,8 @@ public class UserProfile extends AppCompatActivity {
         stage.setText(getPatientStage());
 
         */
+
+        userProfileContext = getApplicationContext();
 
         setContentView(R.layout.activity_user_profile);
         //setContentView(R.layout.activity_menu_fragment);

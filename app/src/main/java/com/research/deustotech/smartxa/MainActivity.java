@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
         //BlueTooth smartxaBluetooth = new BlueTooth();
         //smartxaBluetooth.bluetooth = BluetoothAdapter.getDefaultAdapter();
 
-        //startActivity(new Intent(MainActivity.this, LoginScreen.class));
-
+        startActivity(new Intent(MainActivity.this, LoginScreen.class));
+/*
       //TODO: This is the main function to execute. uncomment after testing.
 
         if(bluetooth != null)
@@ -175,8 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
                 continueBtn.setClickable(false);
 
-                bluetooth_ctrl = new BlueTooth();
-                bluetooth_ctrl.ConnectBlueTooth();
+
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -191,7 +190,10 @@ public class MainActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             // Whatever...
-                                            try{ Thread.sleep(3000); }catch(InterruptedException e){ }
+                                            bluetooth_ctrl = new BlueTooth();
+                                            bluetooth_ctrl.ConnectBlueTooth();
+
+                                            try{ Thread.sleep(5000); }catch(InterruptedException e){ }
                                             if (bluetooth_ctrl.isBtConnected)
                                             {
                                                 //Toast.makeText(this, "Successfully connected to SmartXa.", Toast.LENGTH_SHORT).show();
@@ -243,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
+*/
 
     }
 

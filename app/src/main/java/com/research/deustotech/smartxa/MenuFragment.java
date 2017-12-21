@@ -1,29 +1,22 @@
 package com.research.deustotech.smartxa;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.FractionRes;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import android.app.Fragment;
-
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-//import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//import android.support.v4.app.Fragment;
+
+import com.airbnb.lottie.LottieAnimationView;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -42,12 +35,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Kori on 12/8/17.
  */
 
-public class MenuFragment extends android.support.v4.app.Fragment {
+public class MenuFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 
     public static String doctorsName;
     public static String patientsName;
@@ -73,6 +67,11 @@ public class MenuFragment extends android.support.v4.app.Fragment {
 
     private View mContent;
     private TextView mTextView;
+
+    RadioButton timeDay;
+    RadioButton timeWeek;
+    RadioButton timeAll;
+    LottieAnimationView loadView;
 
     public static android.support.v4.app.Fragment newInstance(String text, int color) {
         android.support.v4.app.Fragment frag = new MenuFragment();
@@ -119,7 +118,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
         // set text and background color
         mTextView.setText(mText);
         mContent.setBackgroundColor(mColor);
-
+        loadView = (LottieAnimationView)view.findViewById(R.id.animation_view3);
 
         patient = (TextView) view.findViewById(R.id.patientName);
         doctor = (TextView) view.findViewById(R.id.doctorName);
@@ -129,11 +128,40 @@ public class MenuFragment extends android.support.v4.app.Fragment {
         doctor.setText(getDoctorsName());
         stage.setText(getPatientStage());
 
+        timeDay = (RadioButton)view.findViewById(R.id.radioButtonDay);
+        timeWeek = (RadioButton)view.findViewById(R.id.radioButtonWeek);
+        timeAll = (RadioButton)view.findViewById(R.id.radioButtonAll);
 
+        timeDay.setOnClickListener(this);
+        timeWeek.setOnClickListener(this);
+        timeAll.setOnClickListener(this);
+
+
+        loadView.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                loadView.setProgress(0f);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
 
         //TODO: Build graph based off of stored preference values. Update values each time new data is collected
 
-        GetToken();
+        GetToken(0); //(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
         //BuildUserStatsGraph();
     }
 
@@ -192,7 +220,38 @@ public class MenuFragment extends android.support.v4.app.Fragment {
 
 
 
-    private void sendData() {
+    @Override
+    public void onClick(View v)
+    {
+        long startDate;
+        System.out.println("Button click event.");
+        switch (v.getId()) {
+            case R.id.radioButtonDay:
+                startDate = 0; //System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
+                System.out.println("Day radio button clicked " + startDate);
+                timeWeek.setChecked(false);
+                timeAll.setChecked(false);
+                GetToken(startDate);
+                break;
+            case R.id.radioButtonWeek:
+                startDate = 0; //System.currentTimeMillis() - TimeUnit.DAYS.toMillis(180);
+                System.out.println("Week radio button clicked " + startDate);
+                timeDay.setChecked(false);
+                timeAll.setChecked(false);
+                GetToken(startDate);
+                break;
+            case R.id.radioButtonAll:
+                startDate = 0;
+                System.out.println("All radio button clicked " + startDate);
+                timeWeek.setChecked(false);
+                timeDay.setChecked(false);
+                GetToken(startDate);
+                break;
+        }
+
+    }
+
+    private void sendData(final long startDate) {
 
 //TODO: Add a legend to the graph
 
@@ -231,7 +290,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
                     json.put("paciente", sp.getString("patient_name", "Antonio Gonzalez")  /*"Antonio Gonzalez"*/);
                     json.put("token", Token.replace("\"",""));
                     json.put("password", /*userPassword*/ "numero1234");
-                    json.put("inicio", 0);
+                    json.put("inicio", startDate);
                     json.put("fin", System.currentTimeMillis());
                     out = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
@@ -289,10 +348,22 @@ public class MenuFragment extends android.support.v4.app.Fragment {
 
 
 
-    private void GetToken() {
+
+
+
+
+    private void GetToken(final long startDate) {
 
         new Thread(new Runnable() {
             public void run() {
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadView.playAnimation();
+
+                    }
+                });
 
                 InputStream in = null;
                 OutputStream out = null;
@@ -305,6 +376,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
                     HttpURLConnection con = (HttpURLConnection) object.openConnection();
                     con.setRequestProperty("Content-Type", "text/html;charset=UTF-8");
                     con.setRequestMethod("POST");
+                    con.setConnectTimeout(2000);
                     con.setDoOutput(true);
                     //con.setDoInput(true);
 
@@ -344,15 +416,35 @@ public class MenuFragment extends android.support.v4.app.Fragment {
                         System.out.println("\nresponse content " + reply);
                         Token = reply.toString();
 
-                        sendData();
+                        sendData(startDate);
                         //startActivity(new Intent(LoginScreen.this, Home.class));
                     } else {
-                        //Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
-                        //tv.setText("Failed to connect: " + respCode);
+                        System.out.println("Unable to request user information from server.");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadView.cancelAnimation();
+                                Toast.makeText(UserProfile.userProfileContext, "Make sure you are connected to a WIFI or Cellular network to populate your progress graph.", Toast.LENGTH_LONG).show();
+
+                            }
+                        });
                     }
 
 
                     con.disconnect();
+                } catch (java.net.SocketTimeoutException e)
+                {
+
+                    System.out.println("Unable to request user information.");
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadView.cancelAnimation();
+                            Toast.makeText(UserProfile.userProfileContext, "Make sure you are connected to a WIFI or Cellular network to populate your progress graph.", Toast.LENGTH_LONG).show();
+
+                        }
+                    });
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -364,12 +456,21 @@ public class MenuFragment extends android.support.v4.app.Fragment {
 
     public void BuildUserStatsGraph()
     {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadView.cancelAnimation();
+
+            }
+        });
+
         // Build the table view with the collected data
 
         try
         {
             //Date date = Date.from(Instant.now()); //new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(Calendar.getInstance().getTime());
             GraphView graph = (GraphView) view.findViewById(R.id.graph);
+            graph.removeAllSeries();
             BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[]
                     {
 
@@ -399,7 +500,7 @@ public class MenuFragment extends android.support.v4.app.Fragment {
             });
 
 
-            series.setTitle("My Past Week ( Ave. %)");
+            series.setTitle("My Progress ( Ave. %)");
 
             series.setOnDataPointTapListener(new OnDataPointTapListener() {
                 @Override
@@ -435,7 +536,8 @@ public class MenuFragment extends android.support.v4.app.Fragment {
             graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
 
             graph.getLegendRenderer().setVisible(true);
-            graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+            graph.getLegendRenderer().setFixedPosition(50,80);
+            //graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
 
         }
         catch (Exception e)

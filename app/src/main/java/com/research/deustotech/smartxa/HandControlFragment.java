@@ -64,6 +64,7 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
     LottieAnimationView pointer;
 
     TextView goodjob;
+    TextView btoothWarning;
 
     static BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
@@ -80,7 +81,7 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
     public int seekBarMax = 0;
     public int rangBarMax = 0;
 
-    BlueTooth _bluetooth_ctrl;
+    BlueTooth _bluetooth_ctrl = null;
 
     SeekBar seekBar;
     TextView textProgress;
@@ -139,7 +140,7 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
         mContent = view.findViewById(R.id.fragment_content);
         mTextView = (TextView) view.findViewById(R.id.text);
         pointer = (LottieAnimationView) view.findViewById(R.id.animation_view);
-
+        btoothWarning = (TextView) view.findViewById(R.id.btoothWarning);
 
         // set text and background color
         mTextView.setText(mText);
@@ -165,7 +166,7 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
         //updateButton = (Button) findViewById(R.id.updatebutton);
         //updateButton.setActivated(false);
         //new ConnectBTFullHand().execute();
-        _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
+        _bluetooth_ctrl = SettingsFragment.bluetooth_ctrl;
 
 
         try {
@@ -219,6 +220,28 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
 
             }
         });
+
+
+        // show btooth warning
+        if(_bluetooth_ctrl == null)
+        {
+            System.out.println("btooth control is null");
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(UserProfile.userProfileContext, "Your device is not connected to Smartxa. Go to settings and select \"Connect to Smartxa\"", Toast.LENGTH_LONG).show();
+
+                }
+            });
+
+            btoothWarning.setVisibility(View.VISIBLE);
+        }
+        else if (_bluetooth_ctrl.isBtConnected)
+        {
+            System.out.println("btooth control is not null");
+            btoothWarning.setVisibility(View.INVISIBLE);
+        }
 
 
     }
@@ -307,42 +330,57 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
                                               int rightPinIndex, String leftPinValue, String rightPinValue) {
 
-                updateAngle();
-
-                //System.out.println(repProgress.getText().toString() + " " + totalRepText.getText().toString().replace("/", ""));
-
-
-                if (repProgress.getText().toString().equals(totalRepText.getText().toString())) {
-                    System.out.println("Finished reps " + repProgress.getText().toString() + totalRepText.getText().toString().replace("/", ""));
-                    //TODO: Notify user that test is finished.
-
-                    GetToken();
-                    repProgress.setText(Integer.toString(0));
-                    repCounter = 0;
-
-                    pointer.playAnimation();
-                }
-
-                // Get the max value for the angle
-                if (rightPinIndex >= rangBarMax)
+                // show btooth warning
+                if(_bluetooth_ctrl == null)
                 {
-                    rangBarMax = rightPinIndex;
-                    //GetToken();
-
+                    System.out.println("btooth control is null");
+                    btoothWarning.setVisibility(View.VISIBLE);
                 }
-                if (rightPinIndex>5){
-                    comprobacion = 1;
-                }
-
-                // Update the rep count
-                if (rangBarMax > 5 && rightPinIndex < 5 && comprobacion == 1)
+                else if (_bluetooth_ctrl.isBtConnected)
                 {
-                    repCounter++;
-                    repProgress.setText(Integer.toString(repCounter));
-                    comprobacion = 0;
+                    System.out.println("btooth control is not null");
+                    btoothWarning.setVisibility(View.INVISIBLE);
 
 
+                    updateAngle();
+
+                    //System.out.println(repProgress.getText().toString() + " " + totalRepText.getText().toString().replace("/", ""));
+
+
+                    if (repProgress.getText().toString().equals(totalRepText.getText().toString())) {
+                        System.out.println("Finished reps " + repProgress.getText().toString() + totalRepText.getText().toString().replace("/", ""));
+                        //TODO: Notify user that test is finished.
+
+                        GetToken();
+                        repProgress.setText(Integer.toString(0));
+                        repCounter = 0;
+
+                        pointer.playAnimation();
+                    }
+
+                    // Get the max value for the angle
+                    if (rightPinIndex >= rangBarMax)
+                    {
+                        rangBarMax = rightPinIndex;
+                        //GetToken();
+
+                    }
+                    if (rightPinIndex>5){
+                        comprobacion = 1;
+                    }
+
+                    // Update the rep count
+                    if (rangBarMax > 5 && rightPinIndex < 5 && comprobacion == 1)
+                    {
+                        repCounter++;
+                        repProgress.setText(Integer.toString(repCounter));
+                        comprobacion = 0;
+
+
+                    }
                 }
+
+
 
 
 
@@ -587,7 +625,21 @@ public class HandControlFragment extends android.support.v4.app.Fragment {
     public void onStop()
     {
         super.onStop();
-        GetToken();
+
+        // show btooth warning
+        if(_bluetooth_ctrl == null)
+        {
+            System.out.println("btooth control is null");
+
+            btoothWarning.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            System.out.println("btooth control is not null");
+            btoothWarning.setVisibility(View.INVISIBLE);
+
+            GetToken();
+        }
     }
 
 }

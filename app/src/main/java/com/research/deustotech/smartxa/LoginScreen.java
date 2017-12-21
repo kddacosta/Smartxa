@@ -1,5 +1,6 @@
 package com.research.deustotech.smartxa;
 
+import android.animation.Animator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -36,16 +39,20 @@ public class LoginScreen extends AppCompatActivity {
     private String username;
     private String password;
     private String response;
+    private String patientsname;
     //public static String patientsName;
     //public static String doctorsName;
 
     Button loginButton;
     RequestTokenTask request;
 
+    TextView pleaseWait;
+    LottieAnimationView loadView;
     TextView patientName;
     TextView doctorName;
     Spinner stage;
     SharedPreferences sp;
+    String Token;
 
     // Stuff to reference the textview on the custom input_dialog layout
     //LayoutInflater layoutInflater;
@@ -62,42 +69,41 @@ public class LoginScreen extends AppCompatActivity {
 
         sp = getSharedPreferences( "Smartxa_Preferences", Context.MODE_PRIVATE);
 
-        // Create an instance of the async task -- not executed yet
-        //request = new RequestTokenTask();
-        //request.execute();
+        loadView = (LottieAnimationView) findViewById(R.id.animation_view2);
 
-        //layoutInflater = LayoutInflater.from(LoginScreen.this);
-        //promptView = layoutInflater.inflate(R.layout.input_dialog, null);
+        pleaseWait = (TextView) findViewById(R.id.pleaseWaitText);
 
-        //editText = (EditText) promptView.findViewById(R.id.edittext);
-
-
-    }
-
-
-    /*
-    public void showPasswordListener()
-    {
-        showPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
+        loadView.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked()) {
-                    //checked
-                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                }
-                else
-                {
-                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                }
-                //not checked
+            public void onAnimationStart(Animator animation) {
+
+                pleaseWait.setText("Please Wait..");
             }
 
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+                //loadView.setProgress(0f);
+                //goodjob.setText("");
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+                loadView.setProgress(0f);
+                pleaseWait.setText("");
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
         });
+
 
     }
 
-*/
+
 
     public void loginButtonClicked(View v)
     {
@@ -162,6 +168,7 @@ public class LoginScreen extends AppCompatActivity {
             {
 
                 username = doctorName.getText().toString();
+                patientsname = patientName.getText().toString();
                 showInputDialog();
 
 
@@ -207,28 +214,6 @@ public class LoginScreen extends AppCompatActivity {
 
         final EditText editText = (EditText) promptView.findViewById(R.id.edittext);
 
-/*
-
-        CheckBox showPass = (CheckBox) findViewById(R.id.showPasswordCheckBox);
-        showPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked()) {
-                    //checked
-                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                }
-                else
-                {
-                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                }
-                //not checked
-            }
-
-        });
-
-*/
-
         // setup a dialog window
         alertDialogBuilder.setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -236,8 +221,15 @@ public class LoginScreen extends AppCompatActivity {
                         password = editText.getText().toString();
                         MenuFragment.setUserPassword(password);
 
-                        //startActivity(new Intent(LoginScreen.this, UserProfile.class));
-                        sendCommand(username, password);
+                        loadView.playAnimation();
+                        loginButton.setClickable(false);
+                        loginButton.setBackgroundColor(getResources().getColor(R.color.introduction_transparent_grey));
+
+                        startActivity(new Intent(LoginScreen.this, UserProfile.class));
+//                        GetToken(username, password);
+
+//                        loginButton.setClickable(true);
+//                        loadView.cancelAnimation();
                     }
                 })
                 .setNegativeButton("Cancel",
@@ -326,9 +318,11 @@ public class LoginScreen extends AppCompatActivity {
                         // Debug: display the response in console
                         System.out.println("\nresponse content " + reply);
 
+                        //TODO: The website returns a correct response but the response content shows that the patient is invalid
+                        // The response should check for inalid user, and "Paciente incorrecto"
                         // In our case, the API returns an OK response even if the username or password
                         // are invalid. So we Check the response content.
-                        if (!reply.toString().contains("Usuario inválido"))
+                        if (/*!reply.toString().contains("Usuario inválido") || */!reply.contains("Paciente incorrecto"))
                         {
                             // Open the next window on a successful login
                             startActivity(new Intent(LoginScreen.this, UserProfile.class));
@@ -380,6 +374,298 @@ public class LoginScreen extends AppCompatActivity {
             }
         }).start();
     }
+
+
+    private void sendData(final String _username, final String _patientsname, final String _password) {
+
+        //TODO: Add a legend to the graph
+
+        //final SeekBar seekProgress = (SeekBar) findViewById(R.id.seekBar);
+
+        new Thread(new Runnable() {
+            public void run() {
+
+                InputStream in = null;
+                OutputStream out = null;
+                String reply = "";
+
+                try {
+                    System.out.println("Trying to get data from website");
+
+                    String url = "http://10.32.8.79/sesion/api/paciente";
+                    URL object=new URL(url);
+
+                    HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                    con.setRequestProperty("Content-Type", /*"text/html*/"application/json; charset=UTF-8");
+                    con.setRequestMethod("POST");
+                    con.setDoOutput(true);
+                    //con.setDoInput(true);
+
+                    JSONObject json = new JSONObject();
+                    //System.out.println("test " + _username.toString());
+                    //json.put("username", "test");
+                    //json.put("password","prueba1234");
+                    //String httpPost = command;
+
+                    // Data format for the API
+                    // {"username": "carlos", "password": "numero1234", "paciente": "Antonio Gonzalez", "inicio": 0, "fin": 719964000}
+                    //String date = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+                    json.put("username", /*doctorsName */ _username );
+                    json.put("paciente", /*patientsName*/ _patientsname);
+                    json.put("token", Token.replace("\"",""));
+                    json.put("password", /*userPassword*/ _password);
+                    json.put("inicio", 0);
+                    json.put("fin", System.currentTimeMillis());
+                    out = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+                    writer.write(json.toString());
+                    writer.flush();
+                    writer.close();
+                    out.close();
+
+                    // If we're interested in the reply...
+                    int respCode = con.getResponseCode();
+                    System.out.println("Data send response code " + respCode);
+
+
+                    if (respCode == HttpURLConnection.HTTP_OK) {
+
+
+                        System.out.println("Successfully sent data");
+
+                        String line;
+                        in = con.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        while ((line = reader.readLine()) != null) {
+                            reply += line;
+                        }
+
+                        reader.close();
+                        in.close();
+
+                        // Display the returned JSON in a text box, just for confirmation.
+                        // Code not necessary for this example
+                        //tv.setText(reply);
+                        System.out.println("\nresponse content from login attempt " + reply);
+
+
+                        //TODO: The website returns a correct response but the response content shows that the patient is invalid
+                        // The response should check for invalid user, and "Paciente incorrecto"
+                        // In our case, the API returns an OK response even if the username or password
+                        // are invalid. So we Check the response content.
+
+                        if (reply.toString().contains("Paciente incorrecto"))
+                        {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if (!isFinishing()){
+                                        new AlertDialog.Builder(LoginScreen.this)
+                                                .setTitle("Invalid Information")
+                                                .setMessage("The Patient's name you entered was invalid.")
+                                                .setCancelable(false)
+                                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // Whatever...
+                                                        //doctorName.setHintTextColor(Color.RED);
+                                                    }
+                                                }).show();
+                                    }
+                                }
+                            });
+
+                        }
+                        else
+                        {
+                            // Open the next window on a successful login
+                            startActivity(new Intent(LoginScreen.this, UserProfile.class));
+                        }
+
+
+                    } else {
+                        //Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
+                        //tv.setText("Failed to connect: " + respCode);
+                        System.out.println("Failed to send data");
+                    }
+
+
+                    con.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
+
+
+
+    private void GetToken(final String _username, final String _password) {
+
+
+
+        //TODO: Add request time out to method
+        new Thread(new Runnable() {
+            public void run() {
+
+                InputStream in = null;
+                OutputStream out = null;
+                String reply = "";
+
+                try {
+
+                    String url = "http://10.32.8.79/sesion/api/login";
+                    URL object=new URL(url);
+
+                    HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                    con.setRequestProperty("Content-Type", /*"application/json;charset=UTF-8"*/ "text/html;charset=UTF-8");
+                    con.setRequestMethod("POST");
+                    con.setDoOutput(true);
+                    con.setConnectTimeout(5000);
+                    //con.setDoInput(true);
+
+                    JSONObject json = new JSONObject();
+                    System.out.println("test " + _username.toString());
+                    json.put("username", _username.toString());// "carlos"
+                    json.put("password",_password.toString());//"numero1234"
+                    //String httpPost = command;
+
+                    out = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+                    writer.write(json.toString());
+                    writer.flush();
+                    writer.close();
+                    out.close();
+
+                    // If we're interested in the reply...
+                    int respCode = con.getResponseCode();
+                    System.out.println("response code " + respCode);
+
+
+                    if (respCode == HttpURLConnection.HTTP_OK) {
+
+                        String line;
+                        in = con.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        while ((line = reader.readLine()) != null) {
+                            reply += line;
+                        }
+
+                        reader.close();
+                        in.close();
+
+                        // Display the returned JSON in a text box, just for confirmation.
+                        // Code not necessary for this example
+                        //tv.setText(reply);
+                        System.out.println("\nresponse content " + reply);
+                        Token = reply.toString();
+
+                        if (reply.toString().contains("Usuario inválido") || !reply.toString().contains("correcto"))
+                        {
+
+                            // If the username (doctor's name) or password are invalid, display an alert.
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if (!isFinishing()){
+                                        new AlertDialog.Builder(LoginScreen.this)
+                                                .setTitle("Invalid Information")
+                                                .setMessage("The doctor's name or the password you entered were invalid.")
+                                                .setCancelable(false)
+                                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // Whatever...
+                                                        //doctorName.setHintTextColor(Color.RED);
+                                                    }
+                                                }).show();
+                                    }
+                                }
+                            });
+
+
+                        }
+                        else
+                        {
+                            sendData(username, patientsname, password);
+                        }
+
+
+                    } else {
+                        Toast.makeText(getApplicationContext(),"Failed login attempt. Please try again", Toast.LENGTH_LONG).show();
+                        //tv.setText("Failed to connect: " + respCode);
+                    }
+
+
+                    con.disconnect();
+                } catch (java.net.SocketTimeoutException e) {
+                    e.printStackTrace();
+                    System.out.println("Failed to contact host: " + e);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (!isFinishing()){
+                                new AlertDialog.Builder(LoginScreen.this)
+                                        .setTitle("Login Failed")
+                                        .setMessage("Something went wrong while trying to connect to the Smartxa service. Please try again.")
+                                        .setCancelable(false)
+                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                loginButton.setClickable(true);
+                                                loadView.cancelAnimation();
+                                                loginButton.setBackgroundColor(getResources().getColor(R.color.holoBlue));
+                                                // Whatever...
+                                                //doctorName.setHintTextColor(Color.RED);
+                                            }
+                                        }).show();
+                            }
+                        }
+                    });
+
+                } catch (Exception e)
+                {
+                    System.out.println("A json exception, IO exception or malformed URL exception was thrown: " + e);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (!isFinishing()){
+                                new AlertDialog.Builder(LoginScreen.this)
+                                        .setTitle("Login Failed")
+                                        .setMessage("Something went wrong while trying to connect to the Smartxa service. Please try again.")
+                                        .setCancelable(false)
+                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                loginButton.setClickable(true);
+                                                loadView.cancelAnimation();
+                                                loginButton.setBackgroundColor(getResources().getColor(R.color.holoBlue));
+                                                // Whatever...
+                                                //doctorName.setHintTextColor(Color.RED);
+                                            }
+                                        }).show();
+                            }
+                        }
+                    });
+                }
+
+            }
+        }).start();
+
+
+    }
+
 
 
 

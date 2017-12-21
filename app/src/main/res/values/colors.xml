@@ -10,5 +10,7 @@
     <color name="yellow">#ffff00</color>
     <color name="green">#008000</color>
     <color name="indigo">#4b0082</color>
+    <color name="holoBlue">#ff0099cc</color>
+    <color name="grey">#A9A9A9</color>
 
 </resources>

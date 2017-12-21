@@ -121,8 +121,28 @@
             android:layout_marginTop="8dp"
             seekarc:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp"
-            seekarc:layout_constraintHorizontal_bias="0.0"
-            seekarc:layout_constraintVertical_bias="0.851" />
+            seekarc:layout_constraintHorizontal_bias="0.006"
+            seekarc:layout_constraintVertical_bias="0.795" />
+
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_view2"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            app:lottie_autoPlay="false"
+            app:lottie_fileName="check.json"
+            app:lottie_loop="false"
+            android:layout_marginRight="104dp"
+            seekarc:layout_constraintRight_toRightOf="parent"
+            seekarc:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp"
+            seekarc:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp"
+            seekarc:layout_constraintVertical_bias="0.946"
+            seekarc:layout_constraintLeft_toRightOf="@+id/btoothButton"
+            android:layout_marginLeft="8dp"
+            seekarc:layout_constraintHorizontal_bias="0.0" />
+
 
         <Spinner
             android:id="@+id/repSpinner"
@@ -152,11 +172,11 @@
             android:inputType="textPersonName"
             android:text="Name"
             seekarc:layout_constraintBottom_toBottomOf="parent"
-            seekarc:layout_constraintHorizontal_bias="0.156"
+            seekarc:layout_constraintHorizontal_bias="0.143"
             seekarc:layout_constraintLeft_toLeftOf="parent"
             seekarc:layout_constraintRight_toRightOf="parent"
             seekarc:layout_constraintTop_toTopOf="parent"
-            seekarc:layout_constraintVertical_bias="0.716" />
+            seekarc:layout_constraintVertical_bias="0.663" />
 
         <TextView
             android:id="@+id/textView14"
@@ -174,23 +194,89 @@
             seekarc:layout_constraintLeft_toLeftOf="parent"
             seekarc:layout_constraintRight_toRightOf="parent"
             seekarc:layout_constraintTop_toTopOf="parent"
-            seekarc:layout_constraintVertical_bias="0.612" />
+            seekarc:layout_constraintVertical_bias="0.585" />
 
         <Button
             android:id="@+id/changeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="129dp"
+            android:layout_height="45dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/holo_blue_dark"
+            android:elevation="10dp"
             android:text="Change Patient"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            seekarc:layout_constraintBottom_toBottomOf="parent"
+            seekarc:layout_constraintHorizontal_bias="0.089"
+            seekarc:layout_constraintLeft_toLeftOf="parent"
+            seekarc:layout_constraintRight_toRightOf="parent"
+            seekarc:layout_constraintTop_toTopOf="parent"
+            seekarc:layout_constraintVertical_bias="0.784"
+            tools:layout_editor_absoluteX="22dp"
+            tools:layout_editor_absoluteY="363dp" />
+
+        <Button
+            android:id="@+id/btoothButton"
+            android:layout_width="172dp"
+            android:layout_height="45dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/holo_blue_dark"
+            android:elevation="10dp"
+            android:text="Connect to Smartxa"
+            android:textStyle="bold"
+            seekarc:layout_constraintBottom_toBottomOf="parent"
+            seekarc:layout_constraintHorizontal_bias="0.105"
+            seekarc:layout_constraintLeft_toLeftOf="parent"
+            seekarc:layout_constraintRight_toRightOf="parent"
+            seekarc:layout_constraintTop_toTopOf="parent"
+            seekarc:layout_constraintVertical_bias="0.926"
+            tools:layout_editor_absoluteX="19dp"
+            tools:layout_editor_absoluteY="423dp" />
+
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_view3"
+            android:layout_width="91dp"
+            android:layout_height="73dp"
+            app:lottie_autoPlay="false"
+            app:lottie_fileName="simple_loader.json"
+            app:lottie_loop="true"
             seekarc:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="8dp"
             seekarc:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            seekarc:layout_constraintRight_toRightOf="parent"
             android:layout_marginLeft="8dp"
             seekarc:layout_constraintLeft_toLeftOf="parent"
-            seekarc:layout_constraintHorizontal_bias="0.097"
-            seekarc:layout_constraintVertical_bias="0.845" />
+            android:layout_marginRight="8dp"
+            seekarc:layout_constraintRight_toRightOf="parent"
+            seekarc:layout_constraintHorizontal_bias="0.451" />
+
+
+        <TextView
+            android:id="@+id/waitText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="visible"
+            seekarc:layout_constraintBottom_toBottomOf="parent"
+            seekarc:layout_constraintHorizontal_bias="0.458"
+            seekarc:layout_constraintLeft_toLeftOf="parent"
+            seekarc:layout_constraintRight_toRightOf="parent"
+            seekarc:layout_constraintTop_toTopOf="parent"
+            seekarc:layout_constraintVertical_bias="0.535" />
 
 
     </android.support.constraint.ConstraintLayout>

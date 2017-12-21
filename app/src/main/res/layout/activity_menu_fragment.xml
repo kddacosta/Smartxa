@@ -78,6 +78,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
+<!--
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
@@ -97,6 +98,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toTopOf="@+id/graph" />
+-->
 
     <TextView
         android:id="@+id/textView3"
@@ -213,6 +215,23 @@
         android:layout_marginEnd="8dp" />
 
     <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_view3"
+        android:layout_width="114dp"
+        android:layout_height="88dp"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="simple_loader.json"
+        app:lottie_loop="true"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintVertical_bias="0.742" />
+
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animation_view2"
         android:layout_width="60dp"
         android:layout_height="58dp"
@@ -230,23 +249,83 @@
         app:lottie_loop="true"
         app:layout_constraintVertical_bias="0.0" />
 
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/animation_view"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="237dp"
-        app:layout_constraintHorizontal_bias="0.09"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_fileName="graph.json"
-        app:lottie_loop="true"
-        app:layout_constraintLeft_toRightOf="@+id/textView5"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <RadioButton
+        android:id="@+id/radioButtonWeek"
+        android:layout_width="82dp"
+        android:layout_height="31dp"
+        android:text="1 Week"
+        app:layout_constraintRight_toLeftOf="@+id/radioButtonAll"
+        android:layout_marginRight="39dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintBottom_toTopOf="@+id/graph"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <RadioButton
+        android:id="@+id/radioButtonAll"
+        android:layout_width="72dp"
+        android:layout_height="31dp"
+        android:text="Total"
+        android:layout_marginRight="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/graph"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <RadioButton
+        android:id="@+id/radioButtonDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:text="24 Hours"
+        app:layout_constraintBottom_toTopOf="@+id/graph"
+        app:layout_constraintHorizontal_bias="0.531"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/radioButtonWeek"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Graph Timeframe:"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/radioButtonDay"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.031"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_bias="0.981" />
+
+    <!--
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation_view"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="237dp"
+            app:layout_constraintHorizontal_bias="0.09"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="graph.json"
+            app:lottie_loop="true"
+            app:layout_constraintLeft_toRightOf="@+id/textView5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintVertical_bias="0.0" />
+    -->
 
 </android.support.constraint.ConstraintLayout>

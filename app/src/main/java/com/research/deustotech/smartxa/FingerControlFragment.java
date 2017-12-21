@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appyvet.materialrangebar.RangeBar;
 
@@ -47,7 +48,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
     private TextView mTextView;
 
     View view;
-
+    TextView btoothWarning;
 
 
     static BluetoothSocket btSocket = null;
@@ -68,7 +69,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
     String Token;
 
     SharedPreferences sp;
-    BlueTooth _bluetooth_ctrl;
+    BlueTooth _bluetooth_ctrl = null;
 
     public int seekBarMax_f1, seekBarMax_f2, seekBarMax_f3, seekBarMax_f4, seekBarMax_f5 = 0;
 
@@ -129,6 +130,7 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
         // initialize views
         mContent = view.findViewById(R.id.fragment_content);
         mTextView = (TextView) view.findViewById(R.id.text);
+        btoothWarning = (TextView) view.findViewById(R.id.btoothWarning);
 
         // set text and background color
         mTextView.setText(mText);
@@ -181,8 +183,29 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
 */
 
 
-        _bluetooth_ctrl = MainActivity.bluetooth_ctrl;
+        _bluetooth_ctrl = SettingsFragment.bluetooth_ctrl;
 
+
+        // show btooth warning
+        if(_bluetooth_ctrl == null)
+        {
+            System.out.println("btooth control is null");
+
+            btoothWarning.setVisibility(View.VISIBLE);
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(UserProfile.userProfileContext, "Your device is not connected to Smartxa. Go to settings and select \"Connect to Smartxa\"", Toast.LENGTH_LONG).show();
+
+                }
+            });
+        }
+        else if (_bluetooth_ctrl.isBtConnected)
+        {
+            System.out.println("btooth control is not null");
+            btoothWarning.setVisibility(View.INVISIBLE);
+        }
 
 
         seekbar();
@@ -790,7 +813,23 @@ public class FingerControlFragment extends android.support.v4.app.Fragment imple
     public void onStop()
     {
         super.onStop();
-        GetToken();
+        // show btooth warning
+        if(_bluetooth_ctrl == null)
+        {
+            System.out.println("btooth control is null");
+
+            btoothWarning.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            System.out.println("btooth control is not null");
+            btoothWarning.setVisibility(View.INVISIBLE);
+
+            GetToken();
+        }
+
+
+
     }
 
 
